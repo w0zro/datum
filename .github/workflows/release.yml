@@ -54,7 +54,12 @@ jobs:
             echo "::warning::OVSX_PAT not set — skipping Open VSX publish"
           fi
 
-      - name: attach .vsix to the release
+      # Creates the GitHub Release for the tag (if one doesn't already exist),
+      # auto-writes notes from the commits/PRs since the previous tag, and
+      # attaches the built .vsix. No manual step in the GitHub UI.
+      - name: create the GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: ports/vscode/*.vsix
+          generate_release_notes: true
+          fail_on_unmatched_files: true
