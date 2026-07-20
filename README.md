@@ -18,8 +18,10 @@ Every token carries a hue, but **saturation encodes frequency**: the sparse refe
 (variables, calls, parameters, operators — about 75% of the text) gets quiet pastels of the same
 hue. Vivid, but still hierarchical.
 
-📄 **[The ideas](docs/ideas.html)** — the research, the derivation pipeline, the full
-palette tables, and the CVD numbers including the unflattering ones. 🎨 **[Live palette](docs/index.html)** —
+**→ [datum.w0zro.com](https://datum.w0zro.com)** — the live palette, ports, and the ideas behind it.
+
+📄 **[The ideas](https://datum.w0zro.com/ideas.html)** — the research, the derivation pipeline, the
+full palette tables, and the CVD numbers including the unflattering ones. 🎨 **[Live palette](https://datum.w0zro.com)** —
 contrast readouts computed in your browser.
 
 ## Quick start
