@@ -89,4 +89,35 @@ python3 tools/gen_ports.py --check # non-zero exit if any port is stale (CI)
 python3 tools/gen_preview.py       # regenerate the README preview images
 ```
 
+The generated files are **committed**, so nobody has to run the generator to use datum — it's a
+build step for maintainers only. If you change the palette in `tools/derive.py`, re-run
+`gen_ports.py` (and `gen_preview.py`) and commit the results.
+
+## Releasing
+
+CI lives in [`.github/workflows`](.github/workflows):
+
+- **check** — on every push/PR: verifies the committed ports still match the palette
+  (`gen_ports.py --check`), that every generated file parses, and that the colorscheme loads
+  clean in both modes. No secrets needed.
+- **release** — on a `v*` tag: packages the VS Code extension and publishes it to the Marketplace
+  and Open VSX, attaching the `.vsix` to the GitHub Release.
+
+```sh
+git tag v0.1.0 && git push origin v0.1.0   # -> builds + publishes the VS Code extension
+```
+
+Publishing needs two repo secrets (*Settings → Secrets and variables → Actions*); without them the
+`.vsix` is still built and attached, the publish steps just skip:
+
+- `VSCE_PAT` — Marketplace token for the `w0zro` publisher (Azure DevOps)
+- `OVSX_PAT` — [Open VSX](https://open-vsx.org) token (namespace `w0zro`)
+
+Terminal ports get maximum reach by submitting the palette to
+[`iTerm2-Color-Schemes`](https://github.com/mbadolato/iTerm2-Color-Schemes) — the upstream that
+feeds Ghostty, WezTerm, Kitty, Alacritty and many others' built-in theme pickers. That's a one-off
+manual PR, not part of CI.
+
+## License
+
 MIT.
