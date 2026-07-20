@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>datum — a vim colorscheme</title>
+<meta name="description" content="datum, a light and dark 256-color vim colorscheme. Palette reference and live preview." />
+<style>
+  :root {
+    color-scheme: light dark;
+    /* light: tier-1 accents (saturated) + tier-2 glue (dark pastels) */
+    --bg0: #f1f6fd; --bg1: #e7ecf2; --bg2: #ced3d9;
+    --fg0: #292e35; --fg1: #616a76;
+    --red: #a44602; --orange: #976700; --yellow: #756f1d;
+    --green: #107c5a; --cyan: #0b7b80; --blue: #0068a4; --purple: #983472;
+    --var: #4d3919; --call: #633750; --param: #154b4e; --op: #2f516c;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg0: #0f1318; --bg1: #181c21; --bg2: #2b2f35;
+      --fg0: #dbe0e8; --fg1: #8f98a3;
+      --red: #ef844a; --orange: #e6ac4c; --yellow: #d8cf58;
+      --green: #51daa7; --cyan: #5ddae0; --blue: #66b6f4; --purple: #db78b1;
+      --var: #fcdcad; --call: #f5b9d9; --param: #a5f5f9; --op: #b2dafb;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg0: #0f1318; --bg1: #181c21; --bg2: #2b2f35;
+    --fg0: #dbe0e8; --fg1: #8f98a3;
+    --red: #ef844a; --orange: #e6ac4c; --yellow: #d8cf58;
+    --green: #51daa7; --cyan: #5ddae0; --blue: #66b6f4; --purple: #db78b1;
+    --var: #fcdcad; --call: #f5b9d9; --param: #a5f5f9; --op: #b2dafb;
+  }
+
+  :root[data-theme="light"] {
+    --bg0: #f1f6fd; --bg1: #e7ecf2; --bg2: #ced3d9;
+    --fg0: #292e35; --fg1: #616a76;
+    --red: #a44602; --orange: #976700; --yellow: #756f1d;
+    --green: #107c5a; --cyan: #0b7b80; --blue: #0068a4; --purple: #983472;
+    --var: #4d3919; --call: #633750; --param: #154b4e; --op: #2f516c;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    background: var(--bg0);
+    color: var(--fg0);
+  }
+
+  body {
+    font-family: var(--font-serif);
+    transition: background-color .25s ease, color .25s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  a { color: var(--blue); }
+
+  .buffer {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  .gutter {
+    background: var(--bg0);
+    border-right: 1px solid var(--bg2);
+    color: var(--bg2);
+    font-family: var(--font-mono);
+    font-size: .75rem;
+    line-height: 1.8rem;
+    text-align: right;
+    padding: 4.2rem .75rem 2rem 0;
+    user-select: none;
+    white-space: pre-line;
+    overflow: hidden;
+  }
+
+  .editor {
+    min-width: 0;
+    border-left: 1px solid var(--bg2);
+  }
+
+  .titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .7rem 1.25rem;
+    background: var(--bg1);
+    border-bottom: 1px solid var(--bg2);
+  }
+
+  .traffic { display: flex; gap: .4rem; flex-shrink: 0; }
+  .dot { width: .65rem; height: .65rem; border-radius: 50%; display: inline-block; }
+  .dot.red { background: var(--red); }
+  .dot.yellow { background: var(--yellow); }
+  .dot.green { background: var(--green); }
+
+  .filename {
+    font-family: var(--font-mono);
+    font-size: .8rem;
+    color: var(--fg1);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mode-toggle {
+    font-family: var(--font-mono);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--bg0);
+    background: var(--blue);
+    border: none;
+    border-radius: 3px;
+    padding: .35rem .6rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .mode-toggle:hover { filter: brightness(1.08); }
+  .mode-toggle:focus-visible,
+  .swatch:focus-visible,
+  .tab:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+
+  main {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  section { margin-bottom: 4.5rem; }
+
+  .comment-line {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: .8rem;
+    color: var(--fg1);
+    font-style: italic;
+    margin-bottom: .75rem;
+  }
+
+  h1 {
+    font-family: var(--font-mono);
+    font-size: clamp(3rem, 9vw, 5.5rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin: 0 0 1rem;
+    color: var(--blue);
+    text-wrap: balance;
+  }
+
+  .tagline {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    max-width: 42rem;
+    color: var(--fg0);
+    margin: 0 0 1rem;
+  }
+
+  .method {
+    font-family: var(--font-mono);
+    font-size: .8rem;
+    color: var(--fg1);
+    margin: 0 0 2rem;
+  }
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--fg1);
+    margin: 0 0 1.5rem;
+  }
+  h2::before { content: '" '; }
+
+  pre {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    background: var(--bg1);
+    border: 1px solid var(--bg2);
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: .85rem;
+    line-height: 1.65;
+  }
+
+  .install { color: var(--fg0); }
+  .install .k { color: var(--purple); }
+
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+    gap: .9rem;
+  }
+
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .6rem;
+    padding: .9rem;
+    border: 1px solid var(--bg2);
+    border-radius: 6px;
+    background: var(--bg1);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    text-align: left;
+    color: var(--fg0);
+    position: relative;
+  }
+  .swatch:hover { border-color: var(--fg1); }
+
+  .swatch-chip {
+    width: 100%;
+    height: 2.25rem;
+    border-radius: 4px;
+    border: 1px solid var(--bg2);
+  }
+
+  .swatch-name {
+    font-size: .8rem;
+    font-weight: 700;
+  }
+
+  .swatch-role {
+    font-size: .7rem;
+    color: var(--fg1);
+    font-style: italic;
+  }
+
+  .swatch-code {
+    font-size: .72rem;
+    color: var(--fg1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .swatch-metrics {
+    display: flex;
+    gap: .35rem;
+    font-size: .64rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .metric {
+    color: var(--fg1);
+    border: 1px solid var(--bg2);
+    border-radius: 3px;
+    padding: .05rem .3rem;
+  }
+  .metric.pass { color: var(--green); border-color: var(--green); }
+  .metric.warn { color: var(--orange); border-color: var(--orange); }
+
+  .swatch-toast {
+    position: absolute;
+    top: .5rem;
+    right: .5rem;
+    font-size: .65rem;
+    background: var(--green);
+    color: var(--bg0);
+    padding: .15rem .4rem;
+    border-radius: 3px;
+    opacity: 0;
+    transform: translateY(-.25rem);
+    transition: opacity .15s ease, transform .15s ease;
+    pointer-events: none;
+  }
+  .swatch-toast.show { opacity: 1; transform: translateY(0); }
+
+  .tabs {
+    display: flex;
+    gap: .25rem;
+    margin-bottom: -1px;
+  }
+
+  .tab {
+    font-family: var(--font-mono);
+    font-size: .78rem;
+    color: var(--fg1);
+    background: var(--bg0);
+    border: 1px solid var(--bg2);
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    padding: .5rem .9rem;
+    cursor: pointer;
+  }
+  .tab[aria-selected="true"] {
+    color: var(--fg0);
+    background: var(--bg1);
+  }
+
+  .code-preview { border-radius: 0 6px 6px 6px; }
+  .code-preview code { display: block; white-space: pre; }
+  .code-preview .lang { display: none; }
+  .code-preview .lang.active { display: block; }
+
+  .tok-comment { color: var(--fg1); font-style: italic; }
+  .tok-string { color: var(--green); }
+  .tok-number { color: var(--orange); }
+  .tok-keyword { color: var(--blue); }
+  .tok-function { color: var(--purple); }
+  .tok-type { color: var(--cyan); }
+  .tok-constant { color: var(--yellow); }
+  /* tier 2 -- pastel glue */
+  .tok-var { color: var(--var); }
+  .tok-call { color: var(--call); }
+  .tok-param { color: var(--param); }
+  .tok-operator { color: var(--op); }
+  .tok-punc { color: var(--fg1); }
+  .tok-plain { color: var(--fg0); }
+
+  footer {
+    border-top: 1px solid var(--bg2);
+    padding-top: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: .78rem;
+    color: var(--fg1);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .75rem;
+  }
+</style>
+</head>
+<body>
+<div class="buffer">
+  <div class="gutter" id="gutter" aria-hidden="true"></div>
+  <div class="editor">
+    <div class="titlebar">
+      <div class="traffic"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+      <div class="filename">~/.vim/colors/datum.vim</div>
+      <button class="mode-toggle" id="themeToggle" type="button" aria-pressed="false">-- NORMAL --</button>
+    </div>
+    <main>
+      <section class="hero">
+        <span class="comment-line">" a light + dark vim colorscheme, derived not guessed</span>
+        <h1>datum</h1>
+        <p class="tagline">A colorscheme reverse-engineered from color science. Hue angles are anchored on the Okabe&ndash;Ito colorblind-safe set, placed in OKLCH, checked against WCAG&nbsp;2.2 and APCA contrast, and simulated for color-vision deficiency. Every token carries a hue, but <em>saturation encodes frequency</em>: the sparse reference points run at full chroma, the ubiquitous glue (variables, calls, operators) in quiet pastels of the same hue. The two modes share hue identity but are tuned separately — a dark theme is not an inverted light one.</p>
+        <p class="method">Read the reasoning: <a href="whitepaper.html">the design whitepaper</a> — the research findings, the derivation pipeline, and every measured number.</p>
+        <pre class="install"><code><span class="k">Plug</span> 'w0zro/datum.nvim'
+<span class="tok-comment">" then, in your vimrc</span>
+<span class="k">set</span> background=dark   <span class="tok-comment">" or light</span>
+<span class="k">colorscheme</span> datum</code></pre>
+      </section>
+
+      <section class="palette">
+        <h2>palette — click a swatch to copy, readouts are computed live</h2>
+        <div class="swatch-grid" id="swatchGrid"></div>
+      </section>
+
+      <section class="preview">
+        <h2>preview</h2>
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" data-lang="vim" aria-selected="true" type="button">datum.vim</button>
+          <button class="tab" role="tab" data-lang="lua" aria-selected="false" type="button">init.lua</button>
+        </div>
+        <pre class="code-preview"><code class="lang active" data-lang="vim"><span class="tok-comment">" hue identity: same angle, per-mode L/C</span>
+<span class="tok-keyword">if</span> &amp;background ==# <span class="tok-string">'light'</span>
+  <span class="tok-keyword">let</span> s:blue = [<span class="tok-string">'25'</span>, <span class="tok-string">'#0068a4'</span>]  <span class="tok-comment">" h244 L0.50</span>
+<span class="tok-keyword">else</span>
+  <span class="tok-keyword">let</span> s:blue = [<span class="tok-string">'75'</span>, <span class="tok-string">'#66b6f4'</span>] <span class="tok-comment">" h244 L0.75</span>
+<span class="tok-keyword">endif</span>
+
+<span class="tok-comment">" keywords colored, not bold; operators get the pastel</span>
+call s:hi(<span class="tok-string">'Keyword'</span>, s:blue)
+</code><code class="lang" data-lang="lua"><span class="tok-comment">-- chroma tiers: full-chroma reference points,</span>
+<span class="tok-comment">-- pastel glue (variables, calls, params, operators).</span>
+<span class="tok-keyword">local</span> <span class="tok-var">M</span> <span class="tok-operator">=</span> <span class="tok-punc">{}</span>
+
+<span class="tok-keyword">function</span> <span class="tok-function">M.setup</span><span class="tok-punc">(</span><span class="tok-param">opts</span><span class="tok-punc">)</span>
+  <span class="tok-keyword">local</span> <span class="tok-var">retries</span> <span class="tok-operator">=</span> <span class="tok-number">3</span>
+  <span class="tok-keyword">local</span> <span class="tok-var">ok</span> <span class="tok-operator">=</span> <span class="tok-var">retries</span> <span class="tok-operator">&gt;</span> <span class="tok-number">0</span> <span class="tok-keyword">and</span> <span class="tok-param">opts</span> <span class="tok-operator">~=</span> <span class="tok-constant">nil</span>
+  <span class="tok-keyword">for</span> <span class="tok-var">_</span><span class="tok-punc">,</span> <span class="tok-var">name</span> <span class="tok-keyword">in</span> <span class="tok-call">ipairs</span><span class="tok-punc">(</span><span class="tok-param">opts</span><span class="tok-punc">.</span><span class="tok-var">colors</span><span class="tok-punc">)</span> <span class="tok-keyword">do</span>
+    <span class="tok-call">apply</span><span class="tok-punc">(</span><span class="tok-var">name</span><span class="tok-punc">,</span> <span class="tok-var">retries</span> <span class="tok-operator">-</span> <span class="tok-number">1</span><span class="tok-punc">)</span>
+  <span class="tok-keyword">end</span>
+  <span class="tok-keyword">return</span> <span class="tok-var">ok</span>
+<span class="tok-keyword">end</span>
+
+<span class="tok-keyword">return</span> <span class="tok-var">M</span>
+</code></pre>
+      </section>
+
+      <footer>
+        <span>w0zro/datum.nvim &middot; MIT</span>
+        <span id="themeStatus">viewing: light</span>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+  // Palette anchored on Okabe-Ito hues, derived in OKLCH. See whitepaper.html.
+  const TOKENS = [
+    { name: 'bg0', role: 'canvas', bg: true, light: { hex: '#f1f6fd', cterm: 231 }, dark: { hex: '#0f1318', cterm: 233 } },
+    { name: 'bg1', role: 'cursorline / statusline', bg: true, light: { hex: '#e7ecf2', cterm: 255 }, dark: { hex: '#181c21', cterm: 234 } },
+    { name: 'bg2', role: 'selection / borders', bg: true, light: { hex: '#ced3d9', cterm: 252 }, dark: { hex: '#2b2f35', cterm: 236 } },
+    { name: 'fg0', role: 'plain text', light: { hex: '#292e35', cterm: 236 }, dark: { hex: '#dbe0e8', cterm: 254 } },
+    { name: 'fg1', role: 'comments · punctuation', light: { hex: '#616a76', cterm: 242 }, dark: { hex: '#8f98a3', cterm: 246 } },
+    { name: 'red', role: 'errors · tier 1', light: { hex: '#a44602', cterm: 130 }, dark: { hex: '#ef844a', cterm: 209 } },
+    { name: 'orange', role: 'numbers · tier 1', light: { hex: '#976700', cterm: 94 }, dark: { hex: '#e6ac4c', cterm: 179 } },
+    { name: 'yellow', role: 'constants · tier 1', light: { hex: '#756f1d', cterm: 94 }, dark: { hex: '#d8cf58', cterm: 185 } },
+    { name: 'green', role: 'strings · tier 1', light: { hex: '#107c5a', cterm: 29 }, dark: { hex: '#51daa7', cterm: 79 } },
+    { name: 'cyan', role: 'types · tier 1', light: { hex: '#0b7b80', cterm: 30 }, dark: { hex: '#5ddae0', cterm: 80 } },
+    { name: 'blue', role: 'keywords · tier 1', light: { hex: '#0068a4', cterm: 25 }, dark: { hex: '#66b6f4', cterm: 75 } },
+    { name: 'purple', role: 'function defs · tier 1', light: { hex: '#983472', cterm: 95 }, dark: { hex: '#db78b1', cterm: 175 } },
+    { name: 'var', role: 'variables · tier 2 (← orange)', light: { hex: '#4d3919', cterm: 236 }, dark: { hex: '#fcdcad', cterm: 223 } },
+    { name: 'call', role: 'fn calls · tier 2 (← purple)', light: { hex: '#633750', cterm: 239 }, dark: { hex: '#f5b9d9', cterm: 218 } },
+    { name: 'param', role: 'parameters · tier 2 (← teal)', light: { hex: '#154b4e', cterm: 23 }, dark: { hex: '#a5f5f9', cterm: 159 } },
+    { name: 'op', role: 'operators · tier 2 (← blue)', light: { hex: '#2f516c', cterm: 239 }, dark: { hex: '#b2dafb', cterm: 153 } },
+  ];
+
+  // ---- contrast math (mirrors tools/derive.py, so the readouts are live proof) ----
+  function hexToRgb01(hx) {
+    hx = hx.replace('#', '');
+    return [0, 2, 4].map(function (i) { return parseInt(hx.substr(i, 2), 16) / 255; });
+  }
+  function srgbToLin(c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function wcagLum(hx) {
+    var r = hexToRgb01(hx).map(srgbToLin);
+    return 0.2126 * r[0] + 0.7152 * r[1] + 0.0722 * r[2];
+  }
+  function wcagRatio(fg, bg) {
+    var a = wcagLum(fg), b = wcagLum(bg), hi = Math.max(a, b), lo = Math.min(a, b);
+    return (hi + 0.05) / (lo + 0.05);
+  }
+  function apcaY(hx) {
+    var r = hexToRgb01(hx);
+    return 0.2126729 * Math.pow(r[0], 2.4) + 0.7151522 * Math.pow(r[1], 2.4) + 0.0721750 * Math.pow(r[2], 2.4);
+  }
+  function apcaLc(txt, bg) {
+    var Yt = apcaY(txt), Yb = apcaY(bg);
+    if (Yt < 0.022) Yt += Math.pow(0.022 - Yt, 1.414);
+    if (Yb < 0.022) Yb += Math.pow(0.022 - Yb, 1.414);
+    if (Math.abs(Yb - Yt) < 0.0005) return 0;
+    var S, out;
+    if (Yb > Yt) { S = (Math.pow(Yb, 0.56) - Math.pow(Yt, 0.57)) * 1.14; out = S < 0.1 ? 0 : S - 0.027; }
+    else { S = (Math.pow(Yb, 0.65) - Math.pow(Yt, 0.62)) * 1.14; out = S > -0.1 ? 0 : S + 0.027; }
+    return Math.abs(out * 100);
+  }
+
+  const swatchGrid = document.getElementById('swatchGrid');
+
+  function currentMode() {
+    const attr = document.documentElement.getAttribute('data-theme');
+    if (attr) return attr;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function renderSwatches() {
+    const mode = currentMode();
+    const bg0 = TOKENS[0][mode].hex;
+    swatchGrid.innerHTML = '';
+    TOKENS.forEach(function (t) {
+      const v = t[mode];
+      const btn = document.createElement('button');
+      btn.className = 'swatch';
+      btn.type = 'button';
+      var readout;
+      if (t.bg) {
+        readout = 'ground';
+      } else {
+        var wc = wcagRatio(v.hex, bg0), lc = apcaLc(v.hex, bg0);
+        var ok = wc >= 4.5;
+        readout = '<span class="metric ' + (ok ? 'pass' : 'warn') + '">WCAG ' + wc.toFixed(1) +
+                  '</span> <span class="metric">APCA ' + Math.round(lc) + '</span>';
+      }
+      btn.innerHTML =
+        '<span class="swatch-chip" style="background:var(--' + t.name + ')"></span>' +
+        '<span class="swatch-name">' + t.name + '</span>' +
+        '<span class="swatch-role">' + t.role + '</span>' +
+        '<span class="swatch-code">' + v.hex + '  cterm ' + v.cterm + '</span>' +
+        '<span class="swatch-metrics">' + readout + '</span>' +
+        '<span class="swatch-toast">copied</span>';
+      btn.addEventListener('click', function () {
+        const text = v.hex + ' (cterm ' + v.cterm + ')';
+        const toast = btn.querySelector('.swatch-toast');
+        function flash() {
+          toast.classList.add('show');
+          setTimeout(function () { toast.classList.remove('show'); }, 900);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(flash, flash);
+        } else {
+          flash();
+        }
+      });
+      swatchGrid.appendChild(btn);
+    });
+  }
+
+  function setMode(mode) {
+    document.documentElement.setAttribute('data-theme', mode);
+    document.getElementById('themeToggle').textContent = mode === 'dark' ? '-- INSERT --' : '-- NORMAL --';
+    document.getElementById('themeToggle').setAttribute('aria-pressed', String(mode === 'dark'));
+    document.getElementById('themeStatus').textContent = 'viewing: ' + mode;
+    renderSwatches();
+  }
+
+  document.getElementById('themeToggle').addEventListener('click', function () {
+    setMode(currentMode() === 'dark' ? 'light' : 'dark');
+  });
+
+  document.querySelectorAll('.tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.tab').forEach(function (t) { t.setAttribute('aria-selected', 'false'); });
+      document.querySelectorAll('.code-preview code').forEach(function (c) { c.classList.remove('active'); });
+      tab.setAttribute('aria-selected', 'true');
+      document.querySelector('.code-preview code[data-lang="' + tab.dataset.lang + '"]').classList.add('active');
+    });
+  });
+
+  (function fillGutter() {
+    const gutterEl = document.getElementById('gutter');
+    const lines = Math.ceil(document.body.scrollHeight / 28.8) + 20;
+    let out = '';
+    for (let i = 1; i <= lines; i++) out += i + '\n';
+    gutterEl.textContent = out;
+  })();
+
+  setMode(currentMode());
+</script>
+</body>
+</html>
