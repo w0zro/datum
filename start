@@ -81,9 +81,9 @@ apply() {
       bat cache --build >/dev/null 2>&1 && ok "rebuilt bat cache" || note "run: bat cache --build"
       note "use:  bat --theme=datum-dark" ;;
     vscode)
-      note "the theme JSON lives in $P/vscode/. To use it, either:"
-      note "  - drop into a themes/ folder of a VS Code theme extension, or"
-      note "  - paste into settings.json under \"workbench.colorCustomizations\"" ;;
+      link "$P/vscode" "$HOME/.vscode/extensions/datum"
+      note "reload VS Code, then pick 'datum (dark)' or 'datum (light)' in Color Theme"
+      note "(or publish it: cd $P/vscode && vsce package && code --install-extension datum-*.vsix)" ;;
     all)
       for a in ghostty kitty alacritty wezterm; do
         if command -v "$a" >/dev/null 2>&1; then head "$a"; apply "$a"; fi

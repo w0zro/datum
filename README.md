@@ -51,7 +51,7 @@ terminal are emitted once, using ANSI color indices, so they inherit the termina
 | **Kitty** | `ports/kitty/datum-{dark,light}.conf` | `include datum-dark.conf` |
 | **Alacritty** | `ports/alacritty/datum-{dark,light}.toml` | `[general] import = [...]` |
 | **WezTerm** | `ports/wezterm/datum-{dark,light}.toml` | `config.color_scheme = 'datum-dark'` |
-| **VS Code** | `ports/vscode/datum-{dark,light}.json` | drop into a theme extension / `colorCustomizations` |
+| **VS Code** | `ports/vscode/` (a ready extension) | `./start apply vscode` (symlinks it in), or publish to the Marketplace |
 | **tmux** | `ports/tmux/datum.tmux` | `source-file …/datum.tmux` |
 | **fzf** | `ports/fzf/datum.sh` | `source …/datum.sh` |
 | **bat** | `ports/bat/datum-{dark,light}.tmTheme` | `bat --theme=datum-dark` |

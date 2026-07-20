@@ -361,7 +361,9 @@ PORTS.update({f"ports/ghostty/datum-{m}": (lambda m=m: ghostty(m)) for m in MODE
 PORTS.update(_per_mode("alacritty", alacritty, "toml"))
 PORTS.update(_per_mode("kitty", kitty, "conf"))
 PORTS.update(_per_mode("wezterm", wezterm, "toml"))
-PORTS.update(_per_mode("vscode", vscode, "json"))
+# VS Code themes live inside the extension folder so `vsce package` / a symlink
+# into ~/.vscode/extensions makes them installable (see ports/vscode/package.json).
+PORTS.update({f"ports/vscode/themes/datum-{m}.json": (lambda m=m: vscode(m)) for m in MODES})
 PORTS.update(_per_mode("bat", bat, "tmTheme"))
 PORTS["ports/tmux/datum.tmux"] = tmux_theme
 PORTS["ports/fzf/datum.sh"] = fzf_theme
