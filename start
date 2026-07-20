@@ -1,0 +1,118 @@
+#!/usr/bin/env sh
+# datum -- a colorscheme for your whole terminal, derived from colour science.
+# Local entrypoint: build the ports, preview the docs, and apply a theme.
+#
+#   ./start              show this + what's installed where
+#   ./start build        regenerate every port from the palette
+#   ./start docs         serve the docs site at http://localhost:8000
+#   ./start apply APP    install datum for APP (or print how to enable it)
+#   ./start apply all    do every terminal app it can, print the rest
+#
+# APPs: ghostty kitty alacritty wezterm nvim tmux fzf delta shell bat vscode
+#
+# Terminal/editor ports come in dark + light. Shell/CLI ports (tmux fzf delta
+# shell) are theme-following: one file, ANSI-indexed, follows your terminal.
+set -eu
+
+REPO=$(cd "$(dirname "$0")" && pwd)
+P="$REPO/ports"
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+c_hdr='\033[1;38;5;75m'; c_ok='\033[38;5;79m'; c_dim='\033[38;5;245m'; c_rst='\033[0m'
+say()  { printf '%b\n' "$*"; }
+head() { printf '%b\n' "\n${c_hdr}$*${c_rst}"; }
+ok()   { printf '%b\n' "  ${c_ok}✓${c_rst} $*"; }
+note() { printf '%b\n' "  ${c_dim}$*${c_rst}"; }
+
+link() { # link SRC DEST  -- symlink, backing up an existing real file
+  src=$1; dest=$2
+  mkdir -p "$(dirname "$dest")"
+  if [ -e "$dest" ] && [ ! -L "$dest" ]; then mv "$dest" "$dest.bak-datum"; note "backed up $dest -> $dest.bak-datum"; fi
+  ln -sf "$src" "$dest"; ok "linked $dest"
+}
+
+build() {
+  head "Building ports"
+  python3 "$REPO/tools/gen_ports.py"
+  [ "${1:-}" = "--previews" ] && python3 "$REPO/tools/gen_preview.py" || true
+}
+
+docs() {
+  head "Serving docs at http://localhost:8000  (Ctrl-C to stop)"
+  command -v open >/dev/null 2>&1 && (sleep 1; open http://localhost:8000/) >/dev/null 2>&1 &
+  cd "$REPO/docs" && exec python3 -m http.server 8000
+}
+
+apply() {
+  case "$1" in
+    ghostty)
+      link "$P/ghostty/datum-dark"  "$CFG/ghostty/themes/datum-dark"
+      link "$P/ghostty/datum-light" "$CFG/ghostty/themes/datum-light"
+      note "add to $CFG/ghostty/config:  theme = light:datum-light,dark:datum-dark" ;;
+    kitty)
+      link "$P/kitty/datum-dark.conf"  "$CFG/kitty/datum-dark.conf"
+      link "$P/kitty/datum-light.conf" "$CFG/kitty/datum-light.conf"
+      note "add to $CFG/kitty/kitty.conf:  include datum-dark.conf" ;;
+    alacritty)
+      link "$P/alacritty/datum-dark.toml"  "$CFG/alacritty/datum-dark.toml"
+      link "$P/alacritty/datum-light.toml" "$CFG/alacritty/datum-light.toml"
+      note "add to $CFG/alacritty/alacritty.toml:  [general]  import = [\"~/.config/alacritty/datum-dark.toml\"]" ;;
+    wezterm)
+      link "$P/wezterm/datum-dark.toml"  "$CFG/wezterm/colors/datum-dark.toml"
+      link "$P/wezterm/datum-light.toml" "$CFG/wezterm/colors/datum-light.toml"
+      note "in your wezterm.lua:  config.color_scheme = 'datum-dark'" ;;
+    nvim)
+      note "install via a plugin manager:  { 'w0zro/datum' }   then  colorscheme datum"
+      note "or symlink the colorscheme directly:"
+      link "$REPO/colors/datum.vim" "$CFG/nvim/colors/datum.vim" ;;
+    tmux)
+      note "add to ~/.tmux.conf:  source-file $P/tmux/datum.tmux" ;;
+    fzf)
+      note "add to ~/.zshrc:  source $P/fzf/datum.sh" ;;
+    delta)
+      note "add to ~/.gitconfig:  [include] path = $P/delta/datum.gitconfig" ;;
+    shell)
+      note "add to ~/.zshrc:  source $P/shell/datum.sh" ;;
+    bat)
+      td=$(bat --config-dir 2>/dev/null || echo "$CFG/bat")/themes
+      mkdir -p "$td"
+      cp "$P/bat/datum-dark.tmTheme" "$P/bat/datum-light.tmTheme" "$td/"
+      ok "copied bat themes to $td"
+      bat cache --build >/dev/null 2>&1 && ok "rebuilt bat cache" || note "run: bat cache --build"
+      note "use:  bat --theme=datum-dark" ;;
+    vscode)
+      note "the theme JSON lives in $P/vscode/. To use it, either:"
+      note "  - drop into a themes/ folder of a VS Code theme extension, or"
+      note "  - paste into settings.json under \"workbench.colorCustomizations\"" ;;
+    all)
+      for a in ghostty kitty alacritty wezterm; do
+        if command -v "$a" >/dev/null 2>&1; then head "$a"; apply "$a"; fi
+      done
+      head nvim; apply nvim
+      for a in tmux fzf delta shell bat vscode; do head "$a"; apply "$a"; done ;;
+    *) say "unknown app: $1"; say "apps: ghostty kitty alacritty wezterm nvim tmux fzf delta shell bat vscode all"; exit 1 ;;
+  esac
+}
+
+status() {
+  say "${c_hdr}datum${c_rst} -- a colorscheme for your whole terminal"
+  head "Ports ($(find "$P" -type f | wc -l | tr -d ' ') files, generated from tools/derive.py)"
+  for d in "$P"/*/; do
+    app=$(basename "$d"); n=$(find "$d" -type f | wc -l | tr -d ' ')
+    printf '  %-11s %s file(s)\n' "$app" "$n"
+  done
+  head "Usage"
+  note "./start build            regenerate every port"
+  note "./start docs             preview the site + palette locally"
+  note "./start apply ghostty    install a theme (or print how to enable it)"
+  note "./start apply all        every terminal it finds, plus instructions"
+}
+
+cmd=${1:-status}
+case "$cmd" in
+  build)  shift; build "$@" ;;
+  docs)   docs ;;
+  apply)  [ $# -ge 2 ] || { say "usage: ./start apply APP"; exit 1; }; apply "$2" ;;
+  status|"") status ;;
+  *) say "unknown command: $cmd"; status; exit 1 ;;
+esac

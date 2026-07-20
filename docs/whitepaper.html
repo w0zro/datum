@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>datum — design whitepaper</title>
 <meta name="description" content="How the datum colorscheme is derived from colour science: OKLCH, WCAG/APCA contrast, Okabe-Ito hue anchoring, and colour-vision-deficiency validation." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
     color-scheme: light dark;
@@ -13,8 +16,9 @@
     --fg0: #292e35; --fg1: #616a76;
     --red: #a44602; --orange: #976700; --yellow: #756f1d;
     --green: #107c5a; --teal: #0b7b80; --blue: #0068a4; --purple: #983472;
-    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-    --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --font-serif: "Fraunces", "Iowan Old Style", Palatino, Georgia, serif;
+    --font-disp: "Bricolage Grotesque", var(--font-mono);
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -58,7 +62,7 @@
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--bg2);
   }
-  header .brand { font-family: var(--font-mono); font-weight: 700; color: var(--blue); }
+  header .brand { font-family: var(--font-disp); font-weight: 800; color: var(--blue); }
   header .sep { color: var(--fg1); font-family: var(--font-mono); font-size: .85rem; flex: 1; }
   .toggle {
     font-family: var(--font-mono); font-size: .72rem; font-weight: 700;
@@ -73,7 +77,7 @@
   .lede { font-size: 1.35rem; line-height: 1.55; color: var(--fg0); margin: 0 0 .5rem; text-wrap: balance; }
   .dek { font-family: var(--font-mono); font-size: .82rem; color: var(--fg1); margin: 0 0 2.5rem; }
 
-  h1 { font-family: var(--font-mono); font-size: clamp(2.2rem, 7vw, 3.2rem); font-weight: 700; letter-spacing: -.02em; color: var(--blue); margin: 0 0 1rem; line-height: 1; }
+  h1 { font-family: var(--font-disp); font-size: clamp(2.6rem, 8vw, 4rem); font-weight: 800; letter-spacing: -.02em; color: var(--blue); margin: 0 0 1rem; line-height: 1; }
   h2 {
     font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700;
     margin: 3.2rem 0 1rem; padding-top: 1.2rem; border-top: 1px solid var(--bg2);
@@ -430,7 +434,7 @@
   </ol>
 
   <footer>
-    w0zro/datum.nvim &middot; MIT &middot; <a href="index.html">palette &amp; live preview</a>
+    w0zro/datum &middot; MIT &middot; <a href="index.html">palette &amp; live preview</a>
   </footer>
 </main>
 <script>
