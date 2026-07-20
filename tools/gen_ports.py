@@ -30,7 +30,7 @@ def pal(mode):
 
 # ANSI slot -> palette role. normal 1-6 = tier-1 accents; bright 9-14 carry the
 # colors ANSI otherwise can't reach: orange (no slot of its own) + the tier-2
-# pastels, so the loud/quiet tier system reaches any 16-color tool.
+# glue, so the loud/quiet tier system reaches any 16-color tool.
 ANSI = {1: "red", 9: "orange", 2: "green", 10: "green", 3: "yellow", 11: "var",
         4: "blue", 12: "op", 5: "purple", 13: "call", 6: "cyan", 14: "param",
         8: "fg1"}

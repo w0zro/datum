@@ -140,11 +140,12 @@
   .swatches { display:grid; grid-template-columns:repeat(auto-fill,minmax(13rem,1fr)); gap:.8rem; }
   .sw { border:1px solid var(--bg2); border-radius:14px; overflow:hidden; background:var(--bg1); text-align:left; cursor:pointer; color:inherit; font:inherit; padding:0; position:relative; }
   .sw:hover{ border-color:var(--fg1); }
-  .sw .chip { height:3.6rem; }
+  .sw .chip { height:3.6rem; box-shadow: inset 0 0 0 1px rgba(128,128,128,.28); }
   .sw .meta { padding:.7rem .85rem .85rem; }
   .sw .nm { font-family:var(--mono); font-weight:600; font-size:.9rem; }
   .sw .role { font-size:.78rem; color:var(--fg1); margin-top:.1rem; }
-  .sw .num { font-family:var(--mono); font-size:.72rem; color:var(--fg1); margin-top:.5rem; font-variant-numeric:tabular-nums; display:flex; gap:.45rem; flex-wrap:wrap; align-items:center; }
+  .sw .num { font-family:var(--mono); font-size:.72rem; color:var(--fg1); margin-top:.5rem; font-variant-numeric:tabular-nums; }
+  .sw .badges { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.45rem; min-height:1.5rem; font-family:var(--mono); font-size:.72rem; }
   .pill { border:1px solid var(--bg2); border-radius:5px; padding:.03rem .35rem; }
   .pill.pass{ color:var(--green); border-color:color-mix(in srgb,var(--green) 45%,transparent); }
   .grouplabel{ font-family:var(--mono); font-size:.78rem; color:var(--fg1); text-transform:uppercase; letter-spacing:.05em; margin:1.8rem 0 .7rem; }
@@ -170,7 +171,7 @@
   <span class="spacer"></span>
   <a class="navlink" href="#palette">Palette</a>
   <a class="navlink" href="#ports">Ports</a>
-  <a class="navlink" href="ideas.html">The ideas</a>
+  <a class="navlink" href="/ideas">The ideas</a>
   <a class="navlink" href="https://github.com/w0zro/datum">GitHub</a>
   <button class="toggle" id="themeToggle" type="button">dark</button>
 </div></nav>
@@ -181,7 +182,7 @@
   <p class="lede">One palette for your whole terminal — reverse-engineered from color science, where <em>saturation encodes how often a token appears</em>.</p>
   <div class="cta">
     <a class="btn primary" href="#install">Get started</a>
-    <a class="btn" href="ideas.html">Read the ideas</a>
+    <a class="btn" href="/ideas">Read the ideas</a>
     <a class="btn" href="https://github.com/w0zro/datum">GitHub ↗</a>
   </div>
   <div class="spectrum" id="spectrum" aria-hidden="true"></div>
@@ -194,7 +195,7 @@
   <div class="split">
     <div class="tierlist">
       <div class="tier t1"><h3>tier 1 · full chroma</h3><p>The sparse reference points — strings, numbers, constants, types, function definitions — run at full saturation.</p></div>
-      <div class="tier t2"><h3>tier 2 · pastel glue</h3><p>The ubiquitous ~75% — variables, calls, parameters, operators — take quiet pastels of the <em>same</em> hue, split from tier&nbsp;1 by lightness (the one channel no color blindness collapses).</p></div>
+      <div class="tier t2"><h3>tier 2 · the glue</h3><p>The ubiquitous ~75% — variables, calls, parameters, operators — take a quieter, lightness-shifted version of the <em>same</em> hue (pale in dark, deep in light), split from tier&nbsp;1 by lightness — the one channel no color blindness collapses.</p></div>
       <div class="tier t0"><h3>neutral</h3><p>Pure punctuation and comments stay gray — earning less than plain text, so the color around them reads louder.</p></div>
     </div>
     <div class="code" id="sample"></div>
@@ -236,7 +237,7 @@ git clone https://github.com/w0zro/datum && <span class="b">cd</span> datum
 
 <footer><div class="wrap">
   <span>datum · MIT · derived from color science</span>
-  <span><a href="ideas.html">The ideas</a> &nbsp;·&nbsp; <a href="https://github.com/w0zro/datum">GitHub</a></span>
+  <span><a href="/ideas">The ideas</a> &nbsp;·&nbsp; <a href="https://github.com/w0zro/datum">GitHub</a></span>
 </div></footer>
 
 <script>
@@ -253,10 +254,10 @@ git clone https://github.com/w0zro/datum && <span class="b">cd</span> datum
     {n:'cyan',role:'types',grp:'tier 1 · full chroma',dark:['#5ddae0',80],light:['#0b7b80',30]},
     {n:'blue',role:'keywords',grp:'tier 1 · full chroma',dark:['#66b6f4',75],light:['#0068a4',25]},
     {n:'purple',role:'function definitions, specials',grp:'tier 1 · full chroma',dark:['#db78b1',175],light:['#983472',95]},
-    {n:'var',role:'variables, members, properties',grp:'tier 2 · pastel glue',dark:['#fcdcad',223],light:['#4d3919',236]},
-    {n:'call',role:'function calls',grp:'tier 2 · pastel glue',dark:['#f5b9d9',218],light:['#633750',239]},
-    {n:'param',role:'parameters',grp:'tier 2 · pastel glue',dark:['#a5f5f9',159],light:['#154b4e',23]},
-    {n:'op',role:'operators',grp:'tier 2 · pastel glue',dark:['#b2dafb',153],light:['#2f516c',239]},
+    {n:'var',role:'variables, members, properties',grp:'tier 2 · the glue',dark:['#fcdcad',223],light:['#4d3919',236]},
+    {n:'call',role:'function calls',grp:'tier 2 · the glue',dark:['#f5b9d9',218],light:['#633750',239]},
+    {n:'param',role:'parameters',grp:'tier 2 · the glue',dark:['#a5f5f9',159],light:['#154b4e',23]},
+    {n:'op',role:'operators',grp:'tier 2 · the glue',dark:['#b2dafb',153],light:['#2f516c',239]},
   ];
   const PORTS = [
     ['Neovim','blue'],['Vim','blue'],['Ghostty','cyan'],['Kitty','green'],['Alacritty','purple'],
@@ -292,7 +293,8 @@ git clone https://github.com/w0zro/datum && <span class="b">cd</span> datum
         readout=`<span class="pill ${wc>=4.5?'pass':''}">WCAG ${wc.toFixed(1)}</span><span class="pill">APCA ${lc}</span>`; }
       b.innerHTML=`<div class="chip" style="background:${hex}"></div><div class="meta">
         <div class="nm">${t.n}</div><div class="role">${t.role}</div>
-        <div class="num">${hex} · ${ct} ${readout}</div></div><span class="toast">copied</span>`;
+        <div class="num">${hex} · ${ct}</div>
+        <div class="badges">${readout}</div></div><span class="toast">copied</span>`;
       b.onclick=()=>{ const tip=b.querySelector('.toast');
         navigator.clipboard?.writeText(hex).then(()=>{},()=>{});
         tip.classList.add('show'); setTimeout(()=>tip.classList.remove('show'),900); };
