@@ -3,42 +3,36 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>datum — design whitepaper</title>
-<meta name="description" content="How the datum colorscheme is derived from colour science: OKLCH, WCAG/APCA contrast, Okabe-Ito hue anchoring, and colour-vision-deficiency validation." />
+<title>datum — the ideas</title>
+<meta name="description" content="How the datum colorscheme is derived from color science: OKLCH, WCAG/APCA contrast, Okabe-Ito hue anchoring, and color-vision-deficiency validation." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    color-scheme: light dark;
-    /* datum light palette — the page is styled with the scheme it documents */
-    --bg0: #f1f6fd; --bg1: #e7ecf2; --bg2: #ced3d9;
-    --fg0: #292e35; --fg1: #616a76;
-    --red: #a44602; --orange: #976700; --yellow: #756f1d;
-    --green: #107c5a; --teal: #0b7b80; --blue: #0068a4; --purple: #983472;
-    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    --font-serif: "Fraunces", "Iowan Old Style", Palatino, Georgia, serif;
-    --font-disp: "Bricolage Grotesque", var(--font-mono);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg0: #0f1318; --bg1: #181c21; --bg2: #2b2f35;
-      --fg0: #dbe0e8; --fg1: #8f98a3;
-      --red: #ef844a; --orange: #e6ac4c; --yellow: #d8cf58;
-      --green: #51daa7; --teal: #5ddae0; --blue: #66b6f4; --purple: #db78b1;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg0: #0f1318; --bg1: #181c21; --bg2: #2b2f35;
-    --fg0: #dbe0e8; --fg1: #8f98a3;
-    --red: #ef844a; --orange: #e6ac4c; --yellow: #d8cf58;
-    --green: #51daa7; --teal: #5ddae0; --blue: #66b6f4; --purple: #db78b1;
+    color-scheme: dark;
+    /* dark by default (matches the docs site); the page is styled with the palette it documents */
+    --bg0:#0f1318; --bg1:#181c21; --bg2:#2b2f35; --fg0:#dbe0e8; --fg1:#8f98a3;
+    --red:#ef844a; --orange:#e6ac4c; --yellow:#d8cf58; --green:#51daa7;
+    --teal:#5ddae0; --blue:#66b6f4; --purple:#db78b1; --accent:var(--teal);
+    --font-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --font-serif:"Fraunces", "Iowan Old Style", Palatino, Georgia, serif;
+    --font-sans:"Hanken Grotesk", system-ui, sans-serif;
+    --font-disp:"Bricolage Grotesque", var(--font-sans);
   }
   :root[data-theme="light"] {
-    --bg0: #f1f6fd; --bg1: #e7ecf2; --bg2: #ced3d9;
-    --fg0: #292e35; --fg1: #616a76;
-    --red: #a44602; --orange: #976700; --yellow: #756f1d;
-    --green: #107c5a; --teal: #0b7b80; --blue: #0068a4; --purple: #983472;
+    color-scheme: light;
+    --bg0:#f1f6fd; --bg1:#e7ecf2; --bg2:#ced3d9; --fg0:#292e35; --fg1:#616a76;
+    --red:#a44602; --orange:#976700; --yellow:#756f1d; --green:#107c5a;
+    --teal:#0b7b80; --blue:#0068a4; --purple:#983472; --accent:var(--blue);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      color-scheme: light;
+      --bg0:#f1f6fd; --bg1:#e7ecf2; --bg2:#ced3d9; --fg0:#292e35; --fg1:#616a76;
+      --red:#a44602; --orange:#976700; --yellow:#756f1d; --green:#107c5a;
+      --teal:#0b7b80; --blue:#0068a4; --purple:#983472; --accent:var(--blue);
+    }
   }
 
   * { box-sizing: border-box; }
@@ -54,39 +48,41 @@
     transition: background-color .25s ease, color .25s ease;
   }
 
-  header {
-    position: sticky; top: 0; z-index: 10;
-    display: flex; align-items: center; gap: 1rem;
-    padding: .7rem clamp(1rem, 5vw, 2rem);
-    background: color-mix(in srgb, var(--bg0) 88%, transparent);
-    backdrop-filter: blur(8px);
+  nav {
+    position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--bg0) 82%, transparent);
     border-bottom: 1px solid var(--bg2);
   }
-  header .brand { font-family: var(--font-disp); font-weight: 800; color: var(--blue); }
-  header .sep { color: var(--fg1); font-family: var(--font-mono); font-size: .85rem; flex: 1; }
+  .navwrap { max-width: 48rem; margin: 0 auto; padding: 0 clamp(1rem, 5vw, 2rem); height: 3.4rem; display: flex; align-items: center; gap: 1.1rem; }
+  a.brand { font-family: var(--font-disp); font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; color: var(--fg0); text-decoration: none; }
+  a.brand b { color: var(--accent); }
+  .navwrap .spacer { flex: 1; }
+  a.navlink { color: var(--fg1); font-family: var(--font-sans); font-size: .9rem; font-weight: 500; text-decoration: none; }
+  a.navlink:hover, a.navlink.current { color: var(--fg0); }
   .toggle {
-    font-family: var(--font-mono); font-size: .72rem; font-weight: 700;
-    color: var(--bg0); background: var(--blue); border: none;
-    border-radius: 3px; padding: .35rem .6rem; cursor: pointer;
+    font-family: var(--font-mono); font-size: .72rem; font-weight: 600;
+    color: var(--bg0); background: var(--accent); border: none;
+    border-radius: 999px; padding: .4rem .8rem; cursor: pointer;
   }
   .toggle:hover { filter: brightness(1.08); }
-  .toggle:focus-visible, a:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .toggle:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   main { max-width: 46rem; margin: 0 auto; padding: 2.5rem clamp(1rem, 5vw, 2rem) 6rem; }
 
   .lede { font-size: 1.35rem; line-height: 1.55; color: var(--fg0); margin: 0 0 .5rem; text-wrap: balance; }
   .dek { font-family: var(--font-mono); font-size: .82rem; color: var(--fg1); margin: 0 0 2.5rem; }
 
-  h1 { font-family: var(--font-disp); font-size: clamp(2.6rem, 8vw, 4rem); font-weight: 800; letter-spacing: -.02em; color: var(--blue); margin: 0 0 1rem; line-height: 1; }
+  h1 { font-family: var(--font-disp); font-size: clamp(2.6rem, 8vw, 4rem); font-weight: 800; letter-spacing: -.03em; margin: 0 0 1rem; line-height: 1;
+    background: linear-gradient(100deg, var(--green), var(--teal) 34%, var(--blue) 62%, var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   h2 {
     font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700;
     margin: 3.2rem 0 1rem; padding-top: 1.2rem; border-top: 1px solid var(--bg2);
     scroll-margin-top: 4rem;
   }
-  h2 .n { color: var(--blue); margin-right: .6rem; }
+  h2 .n { color: var(--accent); margin-right: .6rem; }
   h3 { font-family: var(--font-mono); font-size: .95rem; font-weight: 700; color: var(--teal); margin: 2rem 0 .5rem; }
   p { margin: 0 0 1.1rem; }
-  a { color: var(--blue); text-decoration-color: var(--bg2); text-underline-offset: 2px; }
+  a { color: var(--accent); text-decoration-color: var(--bg2); text-underline-offset: 2px; }
   strong { font-weight: 700; }
   em { color: var(--fg0); }
 
@@ -122,38 +118,42 @@
 </style>
 </head>
 <body>
-<header>
-  <span class="brand">datum</span>
-  <span class="sep">design whitepaper</span>
-  <button class="toggle" id="themeToggle" type="button" aria-pressed="false">-- NORMAL --</button>
-</header>
+<nav><div class="navwrap">
+  <a class="brand" href="index.html"><b>◆</b> datum</a>
+  <span class="spacer"></span>
+  <a class="navlink" href="index.html#palette">Palette</a>
+  <a class="navlink" href="index.html#ports">Ports</a>
+  <a class="navlink current" href="ideas.html">The ideas</a>
+  <a class="navlink" href="https://github.com/w0zro/datum">GitHub</a>
+  <button class="toggle" id="themeToggle" type="button" aria-pressed="false">dark</button>
+</div></nav>
 <main>
-  <p class="dek">" a living design document — when the palette changes, this changes with it</p>
+  <p class="dek">a living design document — when the palette changes, this changes with it</p>
   <h1>Designing&nbsp;datum</h1>
-  <p class="lede">A light and dark colourscheme derived from colour science rather than taste.</p>
-  <p>A colourscheme has two hard jobs and one easy one. The easy job is looking nice in a
+  <p class="lede">A light and dark colorscheme derived from color science rather than taste.</p>
+  <p>A colorscheme has two hard jobs and one easy one. The easy job is looking nice in a
   screenshot. The hard jobs are <em>being legible for hours</em> — across two backgrounds, for eyes
-  that differ — and <em>meaning something</em>, using colour to encode structure rather than smearing
+  that differ — and <em>meaning something</em>, using color to encode structure rather than smearing
   it around as decoration. Most schemes are tuned by nudging hex values until a sample file looks
-  right on the author's monitor. This one is derived from published research, and every colour below
+  right on the author's monitor. This one is derived from published research, and every color below
   has a reason and a measured number attached to it. This page is styled with the palette it
   documents; toggle the theme to see both.</p>
 
   <h2 id="findings"><span class="n">1</span>The research</h2>
   <p>Eleven findings drive the design. The first six are about legibility; the rest are about
-  <em>which colours</em> and <em>how loud</em>.</p>
+  <em>which colors</em> and <em>how loud</em>.</p>
 
   <h3>1.1 &nbsp;Design in a perceptually uniform space — OKLCH</h3>
-  <p><code>sRGB</code> and <code>HSL</code> are perceptually non-uniform: two colours with the same
+  <p><code>sRGB</code> and <code>HSL</code> are perceptually non-uniform: two colors with the same
   HSL "lightness" can differ wildly in apparent brightness. Björn Ottosson's <strong>OKLCH</strong>
   (2020) separates Lightness, Chroma and Hue so that equal L <em>looks</em> equally bright. Give a
   set of accents the same L and they read as a family. <span class="arrow">→</span> We design every
-  colour in OKLCH and export sRGB hex.</p>
+  color in OKLCH and export sRGB hex.</p>
 
   <h3>1.2 &nbsp;Keep hue identity, mirror lightness — the Solarized lesson</h3>
   <p>Ethan Schoonover's <strong>Solarized</strong> was built in CIELAB with <em>symmetric</em>
   lightness relationships, so switching modes preserves the perceived contrast between tones, and its
-  accents keep fixed hues across both modes. <span class="arrow">→</span> A colour's hue <em>angle</em>
+  accents keep fixed hues across both modes. <span class="arrow">→</span> A color's hue <em>angle</em>
   is identical in light and dark mode; only its lightness and chroma change per background.</p>
 
   <h3>1.3 &nbsp;Dark backgrounds are not black; light backgrounds are not white</h3>
@@ -166,9 +166,9 @@
   <h3>1.4 &nbsp;A dark theme is not an inverted light theme</h3>
   <p>Two perceptual effects break naive inversion. <strong>Simultaneous contrast</strong> makes the
   same swatch look dimmer on near-black than on white. The <strong>Bezold–Brücke hue shift</strong>
-  drifts perceived hue as luminance changes. The practical rule: dark-mode colours need a chroma
+  drifts perceived hue as luminance changes. The practical rule: dark-mode colors need a chroma
   boost of roughly 15–25&nbsp;% and sometimes a hue nudge to feel equivalent.
-  <span class="arrow">→</span> Dark accents are re-derived at their own L/C, not the light colours
+  <span class="arrow">→</span> Dark accents are re-derived at their own L/C, not the light colors
   re-plotted.</p>
 
   <h3>1.5 &nbsp;Contrast — WCAG 2.2 as the floor, APCA as the gauge</h3>
@@ -192,7 +192,7 @@
   <p>On dark grounds the high-luminance hues (yellow, green, cyan) read best while saturated blue and
   violet read worst; on white it inverts — blue, red and violet read well, and yellow reads worst
   because its high luminance leaves too little contrast. This is luminance, not taste.
-  <span class="arrow">→</span> It is <em>why</em> the two modes can't share colours and why light-mode
+  <span class="arrow">→</span> It is <em>why</em> the two modes can't share colors and why light-mode
   "yellow" must become a dark olive. Frequent tokens skew warm/high-luminance in dark, cool in light.</p>
 
   <h3>1.8 &nbsp;Saturated blue text is hard to focus — chromostereopsis</h3>
@@ -203,7 +203,7 @@
   butts directly against it.</p>
 
   <h3>1.9 &nbsp;A data-derived hue set — Okabe–Ito</h3>
-  <p>Okabe &amp; Ito's eight-colour qualitative palette (popularised by Bang Wong in <em>Nature
+  <p>Okabe &amp; Ito's eight-color qualitative palette (popularized by Bang Wong in <em>Nature
   Methods</em>, 2011) is the de facto scientific standard: engineered from the start to stay distinct
   under protanopia, deuteranopia <em>and</em> tritanopia, with deliberately distinct luminance per
   hue. <span class="arrow">→</span> Rather than pick arbitrary evenly-spaced hues, datum anchors its
@@ -221,12 +221,12 @@
     white-background contrast (finding&nbsp;1.7).</p>
   </div>
 
-  <h3>1.10 &nbsp;Colour intensity should be inverse to token frequency</h3>
-  <p>Early work (Baecker &amp; Gilmore) found colour cues could improve readability up to ~25&nbsp;%,
+  <h3>1.10 &nbsp;Color intensity should be inverse to token frequency</h3>
+  <p>Early work (Baecker &amp; Gilmore) found color cues could improve readability up to ~25&nbsp;%,
   but practice since (Alabaster; tonsky's <em>everyone is getting syntax highlighting wrong</em>)
-  observes that <em>if everything is highlighted, nothing is</em>. The usual reading of that — "colour
-  fewer tokens" — throws away colour many people genuinely enjoy staring at all day. But the underlying
-  principle isn't about the <em>presence</em> of colour, it's about <em>intensity</em>: a token's
+  observes that <em>if everything is highlighted, nothing is</em>. The usual reading of that — "color
+  fewer tokens" — throws away color many people genuinely enjoy staring at all day. But the underlying
+  principle isn't about the <em>presence</em> of color, it's about <em>intensity</em>: a token's
   loudness should be inverse to how often it appears. That is satisfiable with saturation instead of
   on/off. <span class="arrow">→</span> <strong>Chroma-tiering.</strong> Every token carries a hue, but
   intensity encodes frequency. The sparse reference points (strings, numbers, constants, types,
@@ -234,17 +234,17 @@
   <em>calls</em>, parameters, operators — ~75&nbsp;% of the text) shares those same hues but is pushed
   to a lightness near the foreground: that both separates it from its full-chroma sibling on the
   CVD-safe lightness channel (§1.11) <em>and</em> softens it to a pastel, because the sRGB gamut narrows
-  near white. Pure punctuation and comments stay neutral; keywords are coloured but not bold. The screen
-  reads as vividly coloured, yet the eye still gets a loud/quiet hierarchy.</p>
+  near white. Pure punctuation and comments stay neutral; keywords are colored but not bold. The screen
+  reads as vividly colored, yet the eye still gets a loud/quiet hierarchy.</p>
 
-  <h3>1.11 &nbsp;Colour-vision deficiency is not an edge case</h3>
-  <p>Some form of colour-vision deficiency affects roughly 8&nbsp;% of men and 0.5&nbsp;% of women —
+  <h3>1.11 &nbsp;Color-vision deficiency is not an edge case</h3>
+  <p>Some form of color-vision deficiency affects roughly 8&nbsp;% of men and 0.5&nbsp;% of women —
   the common red-green types are X-linked recessive, which is why prevalence skews male, but it is
   everyone's concern, not a men-only one. The blue↔orange axis survives it, and lightness differences
   survive <em>every</em> kind. <span class="arrow">→</span>
   <strong>CVD-aware:</strong> keep the full hue range, but put the load-bearing contrast on blue/orange
-  and separate any two co-occurring token colours by lightness. This is also exactly what lets the two
-  chroma tiers (§1.10) coexist: a glue colour and its full-chroma sibling share a hue, so <em>only</em>
+  and separate any two co-occurring token colors by lightness. This is also exactly what lets the two
+  chroma tiers (§1.10) coexist: a glue color and its full-chroma sibling share a hue, so <em>only</em>
   the lightness gap tells them apart — and lightness is the one channel no CVD collapses. Validated by
   simulating all three CVD types (Machado et al. 2009).</p>
 
@@ -265,14 +265,14 @@
     (a) reads quiet, (b) separates from the sibling on the CVD-safe channel, and (c) as body text keeps
     the higher contrast. This is tier&nbsp;2.</li>
     <li><strong>Verify &amp; iterate.</strong> Compute WCAG and APCA for every pair, simulate the three
-    CVD types over all eleven colours, and adjust L/C — never the shared hue anchors — until the targets
+    CVD types over all eleven colors, and adjust L/C — never the shared hue anchors — until the targets
     pass.</li>
     <li><strong>Quantize to cterm-256</strong> for terminals without truecolor, noting where the
     approximation diverges.</li>
   </ol>
 
   <h2 id="palette"><span class="n">3</span>The palette</h2>
-  <p>OKLCH is the design source; hex is the sRGB export; cterm is the 256-colour fallback. WCAG and
+  <p>OKLCH is the design source; hex is the sRGB export; cterm is the 256-color fallback. WCAG and
   APCA are measured against that mode's <code>bg0</code>. The modes are not inversions of each other —
   same hue angle, different lightness and chroma.</p>
 
@@ -323,20 +323,20 @@
     </tbody>
   </table>
   </div>
-  <p>Every one of the eleven syntax colours clears WCAG&nbsp;4.5:1 in both modes; light <code>orange</code>
+  <p>Every one of the eleven syntax colors clears WCAG&nbsp;4.5:1 in both modes; light <code>orange</code>
   at 4.5 is the tightest. The two tiers invert their lightness by mode: in dark the glue is a bright
   pastel and the accents are saturated mid-tones; in light the glue goes <em>dark</em> (it is the body
   text, so it should hold the higher contrast) while the accents stay mid. And the modes are genuinely
-  different colours, not inversions — light <code>green</code> is a deep pine, dark <code>green</code> a
+  different colors, not inversions — light <code>green</code> is a deep pine, dark <code>green</code> a
   bright mint, same 165° hue.</p>
 
-  <h2 id="cvd"><span class="n">4</span>Colour-vision-deficiency validation</h2>
+  <h2 id="cvd"><span class="n">4</span>Color-vision-deficiency validation</h2>
   <p>Each CVD type is simulated (Machado 2009, severity&nbsp;1.0) and we measure the
-  <strong>minimum pairwise Oklab distance</strong> across all <strong>eleven</strong> syntax colours
-  (both tiers) — how close the two most similar colours become. Larger is safer.</p>
+  <strong>minimum pairwise Oklab distance</strong> across all <strong>eleven</strong> syntax colors
+  (both tiers) — how close the two most similar colors become. Larger is safer.</p>
   <div class="tablewrap">
   <table>
-    <caption>min pairwise distance over all 11 colours — larger is safer</caption>
+    <caption>min pairwise distance over all 11 colors — larger is safer</caption>
     <thead><tr><th>mode</th><th>normal</th><th>protanopia</th><th>deuteranopia</th><th>tritanopia</th></tr></thead>
     <tbody>
       <tr><td>dark</td><td>0.073</td><td>0.039</td><td>0.047</td><td>0.025</td></tr>
@@ -344,25 +344,25 @@
     </tbody>
   </table>
   </div>
-  <p><strong>Read honestly — this is the real cost of maximal colour.</strong> Eleven colours on seven
+  <p><strong>Read honestly — this is the real cost of maximal color.</strong> Eleven colors on seven
   CVD-safe hues is a crowded wheel: the worst-case separation is far tighter than a restrained palette
   would be (a pre-tier version of datum cleared 0.076 under deuteranopia; this clears 0.047). Two things
   keep it honest. First, the tier split rides <em>lightness</em>, which no CVD collapses, so a glue
-  colour never merges with its own full-chroma sibling — the loud/quiet distinction always survives.
+  color never merges with its own full-chroma sibling — the loud/quiet distinction always survives.
   Second, the tightest residual pairs are low-stakes: in light mode <code>orange</code>↔<code>yellow</code>
   (numbers vs constants) compress to 0.007 under protanopia, but a numeric literal and a
-  <code>SCREAMING_CASE</code> constant are never confusable by anything but colour. The high-frequency,
+  <code>SCREAMING_CASE</code> constant are never confusable by anything but color. The high-frequency,
   high-stakes distinctions — comment vs code, string vs everything, keyword vs variable — all ride the
   blue/green/neutral axis, which stays clear under the common red-green types. This is a deliberate
-  trade of headroom for colour; the restrained palette is one config change away for anyone who wants
+  trade of headroom for color; the restrained palette is one config change away for anyone who wants
   it back.</p>
 
-  <h2 id="assignment"><span class="n">5</span>Token → colour assignment</h2>
+  <h2 id="assignment"><span class="n">5</span>Token → color assignment</h2>
   <p>Full chroma marks the sparse reference points; the pastel tier marks the glue that refers to them.</p>
   <div class="tablewrap">
   <table>
     <caption>tier 1 — full chroma (the reference points)</caption>
-    <thead><tr><th>Tree-sitter / Vim group</th><th>colour</th><th>why</th></tr></thead>
+    <thead><tr><th>Tree-sitter / Vim group</th><th>color</th><th>why</th></tr></thead>
     <tbody>
       <tr><td>@string, String</td><td>green</td><td>sparse, high-value literals</td></tr>
       <tr><td>@number, @boolean, Number, Float</td><td>orange</td><td>literal values, warm end of the CVD axis</td></tr>
@@ -370,7 +370,7 @@
       <tr><td>@type, Type, StorageClass</td><td>teal</td><td>the type layer, one cool step from strings</td></tr>
       <tr><td>@function, @constructor, Function</td><td>purple</td><td>definition sites — the named things</td></tr>
       <tr><td>@keyword, Statement, Conditional</td><td>blue, not bold</td><td>grammar; desaturated per §1.8, recessive</td></tr>
-      <tr><td>@exception, Error, WarningMsg</td><td>red</td><td>the alarm channel, reinforced with attributes not colour alone</td></tr>
+      <tr><td>@exception, Error, WarningMsg</td><td>red</td><td>the alarm channel, reinforced with attributes not color alone</td></tr>
       <tr><td>Search, CursorLineNr, Title</td><td>yellow</td><td>UI highlights — reuses the constant hue</td></tr>
     </tbody>
   </table>
@@ -378,7 +378,7 @@
   <div class="tablewrap">
   <table>
     <caption>tier 2 — pastel (the ubiquitous glue, ~75% of the text)</caption>
-    <thead><tr><th>Tree-sitter group</th><th>colour</th><th>why</th></tr></thead>
+    <thead><tr><th>Tree-sitter group</th><th>color</th><th>why</th></tr></thead>
     <tbody>
       <tr><td>@variable, @variable.member, @property</td><td>var <span style="color:var(--fg1)">(← orange)</span></td><td>a value being used — orange, softened</td></tr>
       <tr><td>@variable.parameter</td><td>param <span style="color:var(--fg1)">(← teal)</span></td><td>a typed input — teal, softened</td></tr>
@@ -389,7 +389,7 @@
   </div>
   <p>Neutral, deliberately: <code>@punctuation.bracket</code> and <code>@punctuation.delimiter</code>
   drop to <code>fg1</code>, and <code>Comment</code> is <code>fg1</code> italic. Pure punctuation is the
-  one thing that earns <em>less</em> than plain text — which is what lets the colour around it read
+  one thing that earns <em>less</em> than plain text — which is what lets the color around it read
   louder.</p>
   <p class="mono" style="font-size:.82rem;color:var(--fg1)">" the story: cool is how the code is built,
   warm is the data running through it, purple is what you named, red is what's broken — and each pastel
@@ -403,16 +403,16 @@
   captures (<code>@function.call</code> vs <code>@function</code>, etc.) are what make the loud/quiet
   split real, so datum is authored against them and the config starts Tree-sitter wherever a parser
   exists.</p>
-  <p><strong>Operators earn their colour on evidence.</strong> They are frequent, so §1.10 would leave
-  them quiet — which the pastel tier does. But the one replicable benefit of colouring a token class is
-  <em>targeted visual search</em>: colour gives no speed-up when the target's colour is unknown, but a
+  <p><strong>Operators earn their color on evidence.</strong> They are frequent, so §1.10 would leave
+  them quiet — which the pastel tier does. But the one replicable benefit of coloring a token class is
+  <em>targeted visual search</em>: color gives no speed-up when the target's color is unknown, but a
   considerable one when it is known and consistent (Sarkar 2015; Beelders &amp; du Plessis eye-tracking).
-  A stable, quiet operator colour turns "find the assignment / the comparison / the pipeline" into a
-  colour-pop search without adding noise — exactly what a pastel in the keyword-blue family delivers.</p>
+  A stable, quiet operator color turns "find the assignment / the comparison / the pipeline" into a
+  color-pop search without adding noise — exactly what a pastel in the keyword-blue family delivers.</p>
 
   <h2 id="repro"><span class="n">6</span>Reproducing &amp; changing the palette</h2>
   <p>The script <a href="../tools/derive.py"><code>tools/derive.py</code></a>
-  (<code>python3 tools/derive.py</code>) is the source of truth for these numbers. To change a colour:
+  (<code>python3 tools/derive.py</code>) is the source of truth for these numbers. To change a color:
   adjust its OKLCH L/C (or, rarely, the shared hue anchor) in the script, re-run the verification,
   confirm the §1.5 targets and §4 CVD separation still hold, then update
   <code>colors/datum.vim</code>, the tables in §3, and the CVD table in §4 <em>in the same change</em>.
@@ -441,12 +441,12 @@
   function currentMode() {
     var a = document.documentElement.getAttribute('data-theme');
     if (a) return a;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   }
   function setMode(m) {
     document.documentElement.setAttribute('data-theme', m);
     var t = document.getElementById('themeToggle');
-    t.textContent = m === 'dark' ? '-- INSERT --' : '-- NORMAL --';
+    t.textContent = m;
     t.setAttribute('aria-pressed', String(m === 'dark'));
   }
   document.getElementById('themeToggle').addEventListener('click', function () {

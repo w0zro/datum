@@ -256,7 +256,7 @@ def palette(mode):
     """Full derived palette for one mode: role -> measured values.
 
     This is the single source of truth every port is generated from -- keeping
-    a port hand-written is how a stale colour sneaks in."""
+    a port hand-written is how a stale color sneaks in."""
     pal = build(mode)
     extras = {k: oklch_to_hex(L, C, H)[0] for k, (L, C, H) in EXTRAS[mode].items()}
     bg0 = pal["bg0"].rstrip("*")

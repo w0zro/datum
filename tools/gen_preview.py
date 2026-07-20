@@ -24,7 +24,7 @@ CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
 # (text, role) -- role maps to a palette key, or a pseudo-role handled below.
 SAMPLE = [
-    [("# datum -- derived from colour science, not taste", "comment")],
+    [("# datum -- derived from color science, not taste", "comment")],
     [("from", "kw"), (" typing ", "plain"), ("import", "kw"), (" ", "plain"), ("Optional", "type")],
     [],
     [("MAX_RETRIES", "const"), (" ", "plain"), ("=", "op"), (" ", "plain"), ("3", "num")],

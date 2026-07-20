@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# datum -- a colorscheme for your whole terminal, derived from colour science.
+# datum -- a colorscheme for your whole terminal, derived from color science.
 # Local entrypoint: build the ports, preview the docs, and apply a theme.
 #
 #   ./start              show this + what's installed where

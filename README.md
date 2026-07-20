@@ -18,7 +18,7 @@ Every token carries a hue, but **saturation encodes frequency**: the sparse refe
 (variables, calls, parameters, operators — about 75% of the text) gets quiet pastels of the same
 hue. Vivid, but still hierarchical.
 
-📄 **[Design whitepaper](docs/whitepaper.html)** — the research, the derivation pipeline, the full
+📄 **[The ideas](docs/ideas.html)** — the research, the derivation pipeline, the full
 palette tables, and the CVD numbers including the unflattering ones. 🎨 **[Live palette](docs/index.html)** —
 contrast readouts computed in your browser.
 

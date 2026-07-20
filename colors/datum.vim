@@ -13,13 +13,13 @@ if !has('gui_running') && &t_Co < 256
 endif
 
 " Palette -----------------------------------------------------------------
-" Accent hue angles are anchored on the Okabe-Ito colour-vision-deficiency-
+" Accent hue angles are anchored on the Okabe-Ito color-vision-deficiency-
 " safe qualitative set; 'cyan' is a teal placed between string-green and
 " keyword-blue. Derived in OKLCH, verified for WCAG 2.2 (>=4.5:1) and APCA,
 " validated against protan/deutan/tritan simulation. Hue angle is shared
 " across both modes (hue identity); only lightness and chroma differ per
-" background. Each entry is [cterm256, guihex]. See docs/whitepaper.html for
-" the full methodology, per-colour L/C/H, and measured contrast numbers.
+" background. Each entry is [cterm256, guihex]. See docs/ideas.html for
+" the full methodology, per-color L/C/H, and measured contrast numbers.
 
 if &background ==# 'light'
   " off-white ground (never pure white -- avoids glare)
@@ -68,8 +68,8 @@ else
 endif
 
 " hi group fg [bg] [attr] [sp] ----------------------------------------------
-" sp sets guisp -- the undercurl/underline colour, which diagnostics need so
-" the squiggle can be coloured while the text keeps its syntax colour. cterm
+" sp sets guisp -- the undercurl/underline color, which diagnostics need so
+" the squiggle can be colored while the text keeps its syntax color. cterm
 " has no equivalent, so it is gui-only.
 function! s:hi(group, fg, ...) abort
   let l:bg   = a:0 >= 1 ? a:1 : []
@@ -95,11 +95,11 @@ call s:hi('EndOfBuffer', s:bg0, s:bg0)
 
 " Chroma-tiered highlighting: everything carries a hue, but *saturation* is
 " inverse to token prevalence -- the frequency-inverse principle applied to
-" chroma rather than to the presence of colour. Sparse reference points
+" chroma rather than to the presence of color. Sparse reference points
 " (strings, numbers, constants, functions) run at full chroma; the ubiquitous
 " glue (variables, operators) is tinted but quiet; pure punctuation and
 " comments stay neutral. Warm = values, cool = grammar, purple = what you
-" defined, red = what's broken. See docs/whitepaper.html for the rationale.
+" defined, red = what's broken. See docs/ideas.html for the rationale.
 
 call s:hi('Comment', s:fg1, [], 'italic')
 
@@ -122,7 +122,7 @@ call s:hi('Label',      s:blue)
 " Operators get a quiet low-chroma blue -- a search cue for = == |> etc.
 " without shouting. Delimiters (, ; {}) are dimmed to fg1 instead: pure
 " punctuation is the one thing that earns *less* than plain, which is what
-" lets the colour around it read louder.
+" lets the color around it read louder.
 " (Identifier/Operator/Delimiter are mostly visible under Tree-sitter; base
 " regex syntax under-populates all three groups.)
 call s:hi('Operator',   s:op)
@@ -200,8 +200,8 @@ call s:hi('SpellLocal', s:cyan,   [], 'underline')
 
 " Diagnostics (LSP) --------------------------------------------------------
 " Severity is its own scale, separate from the syntax palette: red alarms,
-" orange warns, blue informs, teal hints. The squiggle carries the colour
-" (guisp) so the underlying token keeps its own syntax colour.
+" orange warns, blue informs, teal hints. The squiggle carries the color
+" (guisp) so the underlying token keeps its own syntax color.
 call s:hi('DiagnosticError', s:red)
 call s:hi('DiagnosticWarn',  s:orange)
 call s:hi('DiagnosticInfo',  s:blue)

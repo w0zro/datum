@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate per-app colour ports from the derived palette.
+"""Generate per-app color ports from the derived palette.
 
 The palette in derive.py is the source of truth. Every port here is generated
 from it, so a port cannot silently drift out of sync with the scheme (which is
@@ -10,7 +10,7 @@ exactly how a stale purple survived in the first hand-written Ghostty theme).
 
 Terminals and editors get separate dark/light files (they can't follow the OS
 on their own). Shell/CLI tools that run *inside* a terminal are emitted once,
-using ANSI colour indices (0-15) so they inherit the terminal's datum theme and
+using ANSI color indices (0-15) so they inherit the terminal's datum theme and
 follow light/dark automatically.
 """
 import json
@@ -29,8 +29,8 @@ def pal(mode):
 
 
 # ANSI slot -> palette role. normal 1-6 = tier-1 accents; bright 9-14 carry the
-# colours ANSI otherwise can't reach: orange (no slot of its own) + the tier-2
-# pastels, so the loud/quiet tier system reaches any 16-colour tool.
+# colors ANSI otherwise can't reach: orange (no slot of its own) + the tier-2
+# pastels, so the loud/quiet tier system reaches any 16-color tool.
 ANSI = {1: "red", 9: "orange", 2: "green", 10: "green", 3: "yellow", 11: "var",
         4: "blue", 12: "op", 5: "purple", 13: "call", 6: "cyan", 14: "param",
         8: "fg1"}
@@ -119,16 +119,16 @@ def tmux_theme():
         f"# datum -- {GEN}\n"
         "# source-file this from ~/.tmux.conf. Uses ANSI indices so it follows\n"
         "# the terminal's datum theme (and light/dark) automatically.\n"
-        'set -g status-style "bg=default,fg=colour8"\n'
+        'set -g status-style "bg=default,fg=color8"\n'
         'set -g status-left ""\n'
-        'set -g status-right "#[fg=colour8] #S "\n'
-        'set -g window-status-format "#[fg=colour8] #I:#W "\n'
-        'set -g window-status-current-format "#[fg=colour4,bold] #I:#W "\n'
-        'set -g pane-border-style "fg=colour0"\n'
-        'set -g pane-active-border-style "fg=colour4"\n'
-        'set -g mode-style "bg=colour0,fg=colour7"\n'
-        'set -g message-style "bg=colour0,fg=colour3"\n'
-        'set -g message-command-style "bg=colour0,fg=colour3"\n'
+        'set -g status-right "#[fg=color8] #S "\n'
+        'set -g window-status-format "#[fg=color8] #I:#W "\n'
+        'set -g window-status-current-format "#[fg=color4,bold] #I:#W "\n'
+        'set -g pane-border-style "fg=color0"\n'
+        'set -g pane-active-border-style "fg=color4"\n'
+        'set -g mode-style "bg=color0,fg=color7"\n'
+        'set -g message-style "bg=color0,fg=color3"\n'
+        'set -g message-command-style "bg=color0,fg=color3"\n'
     )
 
 
@@ -150,7 +150,7 @@ def fzf_theme():
 def delta_theme():
     return (
         f"# datum -- {GEN}\n"
-        "# add `[include] path = <this file>` to ~/.gitconfig. Named colours\n"
+        "# add `[include] path = <this file>` to ~/.gitconfig. Named colors\n"
         "# resolve to ANSI, so it follows the terminal's datum theme.\n"
         "[delta]\n"
         "    line-numbers = true\n"
