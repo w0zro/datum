@@ -1,0 +1,48 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The committed ports must match what the palette generates. If this fails,
+      # someone edited a port by hand or forgot to run `python3 tools/gen_ports.py`.
+      - name: ports in sync with the palette
+        run: python3 tools/gen_ports.py --check
+
+      - name: generated files parse
+        run: |
+          python3 - <<'EOF'
+          import glob, json, tomllib, plistlib
+          for f in glob.glob("ports/vscode/themes/*.json"):
+              json.load(open(f))
+          for f in glob.glob("ports/alacritty/*.toml") + glob.glob("ports/wezterm/*.toml"):
+              tomllib.load(open(f, "rb"))
+          for f in glob.glob("ports/bat/*.tmTheme"):
+              assert plistlib.load(open(f, "rb")).get("name")
+          json.load(open("ports/vscode/package.json"))
+          print("all generated files parse")
+          EOF
+
+      - name: install neovim
+        run: sudo apt-get update && sudo apt-get install -y neovim
+
+      # The colorscheme must load clean in both modes (a syntax error prints to stderr).
+      - name: colorscheme loads (dark + light)
+        run: |
+          nvim --headless -u NONE \
+            -c "set rtp+=$(pwd)" \
+            -c "set background=dark"  -c "colorscheme datum" \
+            -c "set background=light" -c "colorscheme datum" \
+            -c "qa" 2> nvim_err.txt || true
+          if [ -s nvim_err.txt ]; then echo "colorscheme errored:"; cat nvim_err.txt; exit 1; fi
+          echo "colorscheme loads clean in both modes"

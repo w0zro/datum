@@ -1,0 +1,60 @@
+name: release
+
+# Tag a version to publish the VS Code extension, e.g.:
+#   git tag v0.2.0 && git push origin v0.2.0
+#
+# Requires two repo secrets (Settings -> Secrets and variables -> Actions):
+#   VSCE_PAT  -- Marketplace token for the "w0zro" publisher (Azure DevOps)
+#   OVSX_PAT  -- Open VSX token (open-vsx.org, namespace "w0zro")
+# Without them the publish steps fail; the .vsix is still built and attached.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write   # to attach the .vsix to the GitHub Release
+
+jobs:
+  vscode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Never ship a stale extension: the committed themes must match the palette.
+      - name: ports fresh
+        run: python3 tools/gen_ports.py --check
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: package + publish
+        working-directory: ports/vscode
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          set -e
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm i -g @vscode/vsce ovsx
+          vsce package "$VERSION" -o "datum-$VERSION.vsix"
+          if [ -n "$VSCE_PAT" ]; then
+            vsce publish --packagePath "datum-$VERSION.vsix" -p "$VSCE_PAT"
+          else
+            echo "::warning::VSCE_PAT not set — skipping Marketplace publish"
+          fi
+          if [ -n "$OVSX_PAT" ]; then
+            ovsx publish "datum-$VERSION.vsix" -p "$OVSX_PAT"
+          else
+            echo "::warning::OVSX_PAT not set — skipping Open VSX publish"
+          fi
+
+      - name: attach .vsix to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ports/vscode/*.vsix
