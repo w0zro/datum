@@ -79,10 +79,13 @@
   nav a.navlink { color:var(--fg1); font-size:.92rem; font-weight:500; }
   nav a.navlink:hover { color:var(--fg0); text-decoration:none; }
   .toggle {
-    font-family:var(--mono); font-size:.72rem; font-weight:600; color:var(--bg0);
-    background:var(--accent); border:none; border-radius:999px; padding:.4rem .8rem; cursor:pointer;
+    width:2.15rem; height:2.15rem; padding:0; border-radius:999px; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:transparent; border:1px solid var(--bg2); color:var(--accent);
+    transition:border-color .15s,color .15s;
   }
-  .toggle:hover{ filter:brightness(1.08); }
+  .toggle:hover{ border-color:var(--accent); }
+  .toggle svg{ width:1.05rem; height:1.05rem; display:block; }
   .toggle:focus-visible, a:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 
   header.hero { padding:clamp(3rem,9vw,7rem) 0 3rem; }
@@ -173,7 +176,7 @@
   <a class="navlink" href="#ports">Ports</a>
   <a class="navlink" href="/ideas">The ideas</a>
   <a class="navlink" href="https://github.com/w0zro/datum">GitHub</a>
-  <button class="toggle" id="themeToggle" type="button">dark</button>
+  <button class="toggle" id="themeToggle" type="button" aria-label="Toggle theme"></button>
 </div></nav>
 
 <header class="hero"><div class="wrap">
@@ -241,6 +244,8 @@ git clone https://github.com/w0zro/datum && <span class="b">cd</span> datum
 </div></footer>
 
 <script>
+  const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>';
   const TOKENS = [
     {n:'bg0',role:'canvas, background',grp:'neutral',bg:1,dark:['#0f1318',233],light:['#f1f6fd',231]},
     {n:'bg1',role:'panels, cursorline',grp:'neutral',bg:1,dark:['#181c21',234],light:['#e7ecf2',255]},
@@ -326,7 +331,10 @@ git clone https://github.com/w0zro/datum && <span class="b">cd</span> datum
     <span class="kw">return</span> <span class="cn">None</span>`;
 
   function setMode(m){ document.documentElement.setAttribute('data-theme',m);
-    document.getElementById('themeToggle').textContent=m; renderSwatches(); }
+    var t=document.getElementById('themeToggle');
+    t.innerHTML = m==='dark'?MOON:SUN;
+    t.setAttribute('aria-label','Switch to '+(m==='dark'?'light':'dark')+' theme');
+    renderSwatches(); }
   document.getElementById('themeToggle').onclick=()=>setMode(mode()==='dark'?'light':'dark');
   setMode(mode());
 </script>
