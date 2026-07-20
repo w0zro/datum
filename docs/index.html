@@ -75,7 +75,8 @@
     border-bottom:1px solid var(--bg2);
   }
   nav .wrap { display:flex; align-items:center; gap:1.2rem; height:3.6rem; }
-  .brand { font-family:var(--disp); font-weight:800; font-size:1.35rem; letter-spacing:-.02em; }
+  .brand { font-family:var(--disp); font-weight:800; font-size:1.35rem; letter-spacing:-.02em; color:var(--fg0); text-decoration:none; }
+  .brand:hover { text-decoration:none; }
   .brand b { color:var(--cyan); }
   nav .spacer { flex:1; }
   nav a.navlink { color:var(--fg1); font-size:.92rem; font-weight:500; }
@@ -172,7 +173,7 @@
 </head>
 <body>
 <nav><div class="wrap">
-  <span class="brand"><b>◆</b> datum</span>
+  <a class="brand" href="/"><b>◆</b> datum</a>
   <span class="spacer"></span>
   <a class="navlink" href="#palette">Palette</a>
   <a class="navlink" href="#ports">Ports</a>
