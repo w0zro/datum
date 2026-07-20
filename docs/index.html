@@ -159,12 +159,27 @@
   .toast{ position:absolute; top:.5rem; right:.6rem; font-size:.65rem; font-family:var(--mono); background:var(--green); color:var(--bg0); padding:.1rem .4rem; border-radius:5px; opacity:0; transition:opacity .15s; }
   .toast.show{ opacity:1; }
 
-  .ports { display:grid; grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr)); gap:.7rem; }
-  .port { display:flex; align-items:center; gap:.6rem; border:1px solid var(--bg2); border-radius:12px; padding:.85rem 1rem; background:var(--bg1); font-weight:500; }
-  .port .d{ width:.7rem; height:.7rem; border-radius:50%; flex:none; }
+  .picker { display:grid; grid-template-columns:minmax(11rem,15rem) 1fr; gap:1.4rem; align-items:start; }
+  .toolpick { display:flex; flex-direction:column; gap:.35rem; }
+  .toolchip { display:flex; align-items:center; gap:.65rem; width:100%; text-align:left; cursor:pointer;
+    border:1px solid transparent; border-radius:11px; padding:.6rem .8rem; background:transparent;
+    color:var(--fg1); font:inherit; font-weight:500; transition:background .12s, color .12s, border-color .12s; }
+  .toolchip:hover { background:var(--bg1); color:var(--fg0); }
+  .toolchip .d{ width:.7rem; height:.7rem; border-radius:50%; flex:none; }
+  .toolchip[aria-selected="true"] { background:var(--bg1); border-color:var(--bg2); color:var(--fg0); font-weight:650; }
+  .toolpanel { min-height:20rem; }
+  .toolpanel h3 { font-family:var(--disp); font-size:1.3rem; margin:.1rem 0 .3rem; letter-spacing:-.01em; }
+  .toolpanel .lead { color:var(--fg1); margin:0 0 1.1rem; max-width:56ch; }
+  .toolpanel .step { font-size:.82rem; color:var(--fg1); margin:1.2rem 0 .5rem; text-transform:uppercase; letter-spacing:.04em; font-family:var(--mono); }
+  .toolpanel .step:first-of-type { margin-top:0; }
+  .toolpanel .tip { font-size:.9rem; color:var(--fg1); margin:1.1rem 0 0; padding-left:.9rem; border-left:2px solid var(--bg2); max-width:56ch; }
+  .toolpanel code, .sub code { font-family:var(--mono); font-size:.85em; color:var(--fg0); }
+  @media (max-width:640px){ .picker { grid-template-columns:1fr; }
+    .toolpick { flex-direction:row; flex-wrap:wrap; } .toolchip { width:auto; } }
 
-  pre.term { background:var(--bg1); border:1px solid var(--bg2); border-radius:16px; padding:1.4rem 1.6rem; overflow-x:auto; font-family:var(--mono); font-size:.88rem; line-height:1.9; margin:0; white-space:pre; }
-  pre.term .c{ color:var(--fg1); } pre.term .g{ color:var(--green); } pre.term .b{ color:var(--blue); }
+  pre.term { background:var(--bg1); border:1px solid var(--bg2); border-radius:16px; padding:1.1rem 1.3rem; overflow-x:auto; font-family:var(--mono); font-size:.86rem; line-height:1.85; margin:0; white-space:pre; }
+  pre.term + pre.term { margin-top:.6rem; }
+  pre.term .c{ color:var(--fg1); } pre.term .g{ color:var(--green); } pre.term .b{ color:var(--blue); } pre.term .k{ color:var(--purple); }
 
   footer{ border-top:1px solid var(--bg2); padding:2.5rem 0 3.5rem; color:var(--fg1); font-size:.9rem; }
   footer .wrap{ display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center; }
@@ -176,7 +191,7 @@
   <a class="brand" href="/"><b>◆</b> datum</a>
   <span class="spacer"></span>
   <a class="navlink" href="#palette">Palette</a>
-  <a class="navlink" href="#ports">Ports</a>
+  <a class="navlink" href="#install">Install</a>
   <a class="navlink" href="/ideas">The ideas</a>
   <a class="navlink" href="https://github.com/w0zro/datum">GitHub</a>
   <button class="toggle" id="themeToggle" type="button" aria-label="Toggle theme"></button>
@@ -215,30 +230,14 @@
   <div id="swatchHost"></div>
 </div></section>
 
-<section id="ports"><div class="wrap">
-  <p class="kicker">ports</p>
-  <h2>Theme the whole stack.</h2>
-  <p class="sub">Every port is generated from the same palette, so they can't drift apart. Terminals and editors ship light + dark; shell tools follow your terminal automatically.</p>
-  <div class="ports" id="portHost"></div>
-</div></section>
-
 <section id="install"><div class="wrap">
-  <p class="kicker">get started</p>
-  <h2>One script, locally.</h2>
-  <p class="sub">Clone the repo and run <code style="font-family:var(--mono)">./start</code>. It builds every port and installs the ones you ask for — printing the exact line to enable each, never editing your configs behind your back.</p>
-<pre class="term"><span class="c"># clone and see what's available</span>
-git clone https://github.com/w0zro/datum && <span class="b">cd</span> datum
-./start
-
-<span class="c"># preview the palette + docs locally</span>
-./start docs
-
-<span class="c"># apply to a terminal (or print how to enable it)</span>
-./start apply ghostty
-./start apply <span class="g">all</span>
-
-<span class="c"># Neovim, via any plugin manager</span>
-<span class="g">Plug</span> <span class="g">'w0zro/datum'</span>   <span class="c">"  then :colorscheme datum</span></pre>
+  <p class="kicker">install</p>
+  <h2>Theme the whole stack.</h2>
+  <p class="sub">Every port is generated from the same palette, so they can't drift apart. Pick your tool for the exact steps — terminals and editors ship light + dark, shell tools follow your terminal automatically.</p>
+  <div class="picker">
+    <div class="toolpick" id="toolpick" role="tablist" aria-label="Choose a tool"></div>
+    <div class="toolpanel" id="toolpanel" role="tabpanel"></div>
+  </div>
 </div></section>
 
 <footer><div class="wrap">
@@ -267,10 +266,98 @@ git clone https://github.com/w0zro/datum && <span class="b">cd</span> datum
     {n:'param',role:'parameters',grp:'tier 2 · the glue',dark:['#a5f5f9',159],light:['#154b4e',23]},
     {n:'op',role:'operators',grp:'tier 2 · the glue',dark:['#b2dafb',153],light:['#2f516c',239]},
   ];
-  const PORTS = [
-    ['Neovim','blue'],['Vim','blue'],['Ghostty','cyan'],['Kitty','green'],['Alacritty','purple'],
-    ['WezTerm','orange'],['VS Code','blue'],['tmux','green'],['fzf','purple'],['bat','yellow'],
-    ['delta','red'],['ls · zsh','cyan'],
+  // Install instructions, one per tool. `c` is the accent hue for the dot.
+  const clone = `<span class="c"># clone once — the terminal &amp; CLI ports live in the repo</span>
+git clone https://github.com/w0zro/datum &amp;&amp; <span class="b">cd</span> datum`;
+  const INSTALL = [
+    {id:'nvim', name:'Neovim', c:'blue',
+     lead:'Install with any plugin manager, then select the colorscheme.',
+     html:`<div class="step">plugin manager</div>
+<pre class="term">lazy.nvim   { <span class="g">'w0zro/datum'</span> }
+vim-plug    <span class="k">Plug</span> <span class="g">'w0zro/datum'</span>
+packer      <span class="k">use</span> <span class="g">'w0zro/datum'</span></pre>
+<div class="step">then, in your config</div>
+<pre class="term">vim.o.background = <span class="g">'dark'</span>   <span class="c">-- or 'light'</span>
+vim.cmd.colorscheme(<span class="g">'datum'</span>)</pre>
+<p class="tip">Tree-sitter drives the tier-2 colors — telling a call from a definition, a variable from a parameter. Enable it wherever a parser exists.</p>`},
+
+    {id:'vim', name:'Vim', c:'blue',
+     lead:'Classic Vim works the same. Truecolor recommended so it renders the exact hexes.',
+     html:`<pre class="term"><span class="k">Plug</span> <span class="g">'w0zro/datum'</span></pre>
+<div class="step">then, in your vimrc</div>
+<pre class="term"><span class="k">set</span> termguicolors
+<span class="k">set</span> background=dark   <span class="c">" or light</span>
+<span class="k">colorscheme</span> datum</pre>`},
+
+    {id:'ghostty', name:'Ghostty', c:'cyan',
+     lead:'Ships light + dark and switches with your OS automatically.',
+     html:`<pre class="term">${clone}
+./start apply ghostty</pre>
+<div class="step">or by hand</div>
+<p class="tip" style="border:0;padding:0;margin:0 0 .5rem">Copy <code>ports/ghostty/datum-*</code> into <code>~/.config/ghostty/themes/</code>, then add to your config:</p>
+<pre class="term">theme = light:datum-light,dark:datum-dark</pre>`},
+
+    {id:'kitty', name:'Kitty', c:'green',
+     lead:'Two config files, one include line.',
+     html:`<pre class="term">${clone}
+./start apply kitty</pre>
+<div class="step">or by hand</div>
+<p class="tip" style="border:0;padding:0;margin:0 0 .5rem">Copy <code>ports/kitty/datum-*.conf</code> into <code>~/.config/kitty/</code>, then in <code>kitty.conf</code>:</p>
+<pre class="term">include datum-dark.conf</pre>`},
+
+    {id:'alacritty', name:'Alacritty', c:'purple',
+     lead:'Import the TOML for the mode you want.',
+     html:`<pre class="term">${clone}
+./start apply alacritty</pre>
+<div class="step">or by hand</div>
+<p class="tip" style="border:0;padding:0;margin:0 0 .5rem">Copy <code>ports/alacritty/datum-*.toml</code> into <code>~/.config/alacritty/</code>, then:</p>
+<pre class="term">[general]
+import = [<span class="g">"~/.config/alacritty/datum-dark.toml"</span>]</pre>`},
+
+    {id:'wezterm', name:'WezTerm', c:'orange',
+     lead:'Drop the color files in and name the scheme.',
+     html:`<pre class="term">${clone}
+./start apply wezterm</pre>
+<div class="step">or by hand</div>
+<p class="tip" style="border:0;padding:0;margin:0 0 .5rem">Copy <code>ports/wezterm/datum-*.toml</code> into <code>~/.config/wezterm/colors/</code>, then in <code>wezterm.lua</code>:</p>
+<pre class="term">config.color_scheme = <span class="g">'datum-dark'</span></pre>`},
+
+    {id:'vscode', name:'VS Code', c:'blue',
+     lead:'A ready-to-install extension lives in the repo.',
+     html:`<pre class="term">${clone}
+./start apply vscode</pre>
+<p class="tip">Reload VS Code, then pick <b>datum (dark)</b> or <b>datum (light)</b> in the color-theme picker. Once published, it's also on the Marketplace and Open VSX — search <b>datum</b>.</p>`},
+
+    {id:'tmux', name:'tmux', c:'green',
+     lead:'Statusline + borders, ANSI-indexed so they follow your terminal.',
+     html:`<div class="step">with TPM</div>
+<pre class="term"><span class="c"># in ~/.tmux.conf, then hit prefix + I to install</span>
+set -g @plugin <span class="g">'w0zro/datum'</span></pre>
+<div class="step">or without a plugin manager</div>
+<pre class="term">run-shell ~/path/to/datum/datum.tmux</pre>`},
+
+    {id:'fzf', name:'fzf', c:'purple',
+     lead:'One line in your shell rc points fzf at datum\'s ANSI colors.',
+     html:`<pre class="term">source ~/path/to/datum/ports/fzf/datum.sh</pre>`},
+
+    {id:'bat', name:'bat', c:'yellow',
+     lead:'A syntax theme for bat, matched to the palette.',
+     html:`<pre class="term">${clone}
+./start apply bat</pre>
+<div class="step">or by hand</div>
+<p class="tip" style="border:0;padding:0;margin:0 0 .5rem">Copy <code>ports/bat/datum-*.tmTheme</code> into <code>"$(bat --config-dir)/themes/"</code>, then:</p>
+<pre class="term">bat cache --build
+bat --theme=datum-dark</pre>`},
+
+    {id:'delta', name:'delta', c:'red',
+     lead:'delta reads your git config — include datum\'s.',
+     html:`<pre class="term"><span class="c"># in ~/.gitconfig</span>
+[include]
+    path = ~/path/to/datum/ports/delta/datum.gitconfig</pre>`},
+
+    {id:'shell', name:'ls · zsh', c:'cyan',
+     lead:'Colors for ls, zsh completion and the like — theme-following, one file.',
+     html:`<pre class="term">source ~/path/to/datum/ports/shell/datum.sh</pre>`},
   ];
 
   const systemMode = () => matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
@@ -315,9 +402,22 @@ git clone https://github.com/w0zro/datum && <span class="b">cd</span> datum
     ['green','cyan','blue','purple','red','orange','yellow','var','call','param','op']
       .forEach(n=>{ const s=document.createElement('span'); s.style.background=`var(--${n})`; host.appendChild(s); }); })();
 
-  (function(){ const host=document.getElementById('portHost');
-    for(const pr of PORTS){ const el=document.createElement('div'); el.className='port';
-      el.innerHTML=`<span class="d" style="background:var(--${pr[1]})"></span>${pr[0]}`; host.appendChild(el); } })();
+  (function(){
+    const pick=document.getElementById('toolpick'), panel=document.getElementById('toolpanel');
+    function select(i){
+      const t=INSTALL[i];
+      [...pick.children].forEach((c,j)=>c.setAttribute('aria-selected', j===i?'true':'false'));
+      panel.innerHTML=`<h3>${t.name}</h3><p class="lead">${t.lead}</p>${t.html}`;
+      try{ location.hash!=='#install/'+t.id && history.replaceState(null,'','#install/'+t.id); }catch(e){}
+    }
+    INSTALL.forEach((t,i)=>{ const b=document.createElement('button'); b.type='button';
+      b.className='toolchip'; b.setAttribute('role','tab');
+      b.innerHTML=`<span class="d" style="background:var(--${t.c})"></span>${t.name}`;
+      b.onclick=()=>select(i); pick.appendChild(b); });
+    const want=(location.hash.match(/^#install\/(.+)$/)||[])[1];
+    const start=Math.max(0, INSTALL.findIndex(t=>t.id===want));
+    select(start);
+  })();
 
   document.getElementById('sample').innerHTML =
 `<span class="cm"># datum — saturation encodes frequency</span>
