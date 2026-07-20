@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>datum — the ideas</title>
-<meta name="description" content="How the datum colorscheme is derived from color science: OKLCH, WCAG/APCA contrast, Okabe-Ito hue anchoring, and color-vision-deficiency validation." />
+<meta name="description" content="The short, casual version of why datum looks the way it does: saturation encodes token frequency, colors derived in OKLCH, Okabe-Ito hues, contrast- and colorblindness-checked." />
 <link rel="canonical" href="https://datum.w0zro.com/ideas" />
 <!-- Privacy-friendly analytics by Plausible -->
 <script async src="https://plausible.io/js/pa-Edvx7KI-0WsGySq74M4aU.js"></script>
@@ -14,18 +14,16 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
     color-scheme: dark;
-    /* dark by default (matches the docs site); the page is styled with the palette it documents */
     --bg0:#0f1318; --bg1:#181c21; --bg2:#2b2f35; --fg0:#dbe0e8; --fg1:#8f98a3;
     --red:#ef844a; --orange:#e6ac4c; --yellow:#d8cf58; --green:#51daa7;
     --teal:#5ddae0; --blue:#66b6f4; --purple:#db78b1; --accent:var(--teal);
-    --font-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    --font-serif:"Fraunces", "Iowan Old Style", Palatino, Georgia, serif;
-    --font-sans:"Hanken Grotesk", system-ui, sans-serif;
-    --font-disp:"Bricolage Grotesque", var(--font-sans);
+    --sans:"Hanken Grotesk",system-ui,sans-serif;
+    --disp:"Bricolage Grotesque",var(--sans);
+    --mono:"JetBrains Mono",ui-monospace,monospace;
   }
   :root[data-theme="light"] {
     color-scheme: light;
@@ -42,88 +40,64 @@
     }
   }
 
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none!important} }
   body {
-    margin: 0;
-    background: var(--bg0);
-    color: var(--fg0);
-    font-family: var(--font-serif);
-    font-size: 1.06rem;
-    line-height: 1.72;
-    transition: background-color .25s ease, color .25s ease;
+    margin:0; background:var(--bg0); color:var(--fg0);
+    font-family:var(--sans); font-size:1.08rem; line-height:1.6;
+    -webkit-font-smoothing:antialiased; transition:background-color .3s,color .3s;
   }
 
   nav {
-    position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px);
-    background: color-mix(in srgb, var(--bg0) 82%, transparent);
-    border-bottom: 1px solid var(--bg2);
+    position:sticky; top:0; z-index:10; backdrop-filter:blur(12px);
+    background:color-mix(in srgb,var(--bg0) 82%,transparent); border-bottom:1px solid var(--bg2);
   }
-  .navwrap { max-width: 48rem; margin: 0 auto; padding: 0 clamp(1rem, 5vw, 2rem); height: 3.4rem; display: flex; align-items: center; gap: 1.1rem; }
-  a.brand { font-family: var(--font-disp); font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; color: var(--fg0); text-decoration: none; }
-  a.brand b { color: var(--accent); }
-  .navwrap .spacer { flex: 1; }
-  a.navlink { color: var(--fg1); font-family: var(--font-sans); font-size: .9rem; font-weight: 500; text-decoration: none; }
-  a.navlink:hover, a.navlink.current { color: var(--fg0); }
+  .navwrap { max-width:44rem; margin:0 auto; padding:0 clamp(1rem,5vw,2rem); height:3.4rem; display:flex; align-items:center; gap:1.1rem; }
+  a.brand { font-family:var(--disp); font-weight:800; font-size:1.25rem; letter-spacing:-.02em; color:var(--fg0); text-decoration:none; }
+  a.brand b { color:var(--accent); }
+  .navwrap .spacer { flex:1; }
+  a.navlink { color:var(--fg1); font-size:.9rem; font-weight:500; text-decoration:none; }
+  a.navlink:hover, a.navlink.current { color:var(--fg0); }
   .toggle {
-    width: 2.15rem; height: 2.15rem; padding: 0; border-radius: 999px; cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: transparent; border: 1px solid var(--bg2); color: var(--accent);
-    transition: border-color .15s, color .15s;
+    width:2.15rem; height:2.15rem; padding:0; border-radius:999px; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:transparent; border:1px solid var(--bg2); color:var(--accent);
+    transition:border-color .15s,color .15s;
   }
-  .toggle:hover { border-color: var(--accent); }
-  .toggle svg { width: 1.05rem; height: 1.05rem; display: block; }
-  .toggle:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .toggle:hover { border-color:var(--accent); }
+  .toggle svg { width:1.05rem; height:1.05rem; display:block; }
+  .toggle:focus-visible, a:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 
-  main { max-width: 46rem; margin: 0 auto; padding: 2.5rem clamp(1rem, 5vw, 2rem) 6rem; }
-
-  .lede { font-size: 1.35rem; line-height: 1.55; color: var(--fg0); margin: 0 0 .5rem; text-wrap: balance; }
-  .dek { font-family: var(--font-mono); font-size: .82rem; color: var(--fg1); margin: 0 0 2.5rem; }
-
-  h1 { font-family: var(--font-disp); font-size: clamp(2.6rem, 8vw, 4rem); font-weight: 800; letter-spacing: -.03em; margin: 0 0 1rem; line-height: 1;
-    background: linear-gradient(100deg, var(--green), var(--teal) 34%, var(--blue) 62%, var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  h2 {
-    font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700;
-    margin: 3.2rem 0 1rem; padding-top: 1.2rem; border-top: 1px solid var(--bg2);
-    scroll-margin-top: 4rem;
+  main { max-width:44rem; margin:0 auto; padding:2.8rem clamp(1rem,5vw,2rem) 5rem; }
+  .dek { font-family:var(--mono); font-size:.8rem; color:var(--fg1); margin:0 0 1.2rem; }
+  h1 {
+    font-family:var(--disp); font-weight:800; font-size:clamp(2.8rem,9vw,4.5rem);
+    letter-spacing:-.035em; line-height:.95; margin:0 0 1rem;
+    background:linear-gradient(100deg,var(--green),var(--teal) 34%,var(--blue) 62%,var(--purple));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  h2 .n { color: var(--accent); margin-right: .6rem; }
-  h3 { font-family: var(--font-mono); font-size: .95rem; font-weight: 700; color: var(--teal); margin: 2rem 0 .5rem; }
-  p { margin: 0 0 1.1rem; }
-  a { color: var(--accent); text-decoration-color: var(--bg2); text-underline-offset: 2px; }
-  strong { font-weight: 700; }
-  em { color: var(--fg0); }
+  .lede { font-size:1.3rem; line-height:1.45; color:var(--fg0); margin:0 0 1rem; text-wrap:balance; }
+  .lede em, p em { font-style:normal; color:var(--accent); }
 
-  code, .mono { font-family: var(--font-mono); font-size: .86em; }
-  p code, li code, td code { background: var(--bg1); padding: .08em .35em; border-radius: 3px; }
+  h2 { font-family:var(--disp); font-weight:700; font-size:1.5rem; letter-spacing:-.02em; margin:2.6rem 0 .6rem; }
+  p { margin:0 0 1rem; color:var(--fg0); }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; text-underline-offset:3px; }
+  code { font-family:var(--mono); font-size:.85em; background:var(--bg1); padding:.08em .35em; border-radius:4px; }
+  b { font-weight:700; }
 
-  ul, ol { margin: 0 0 1.1rem; padding-left: 1.3rem; }
-  li { margin: 0 0 .5rem; }
+  ul { margin:0 0 1rem; padding:0; list-style:none; display:flex; flex-direction:column; gap:.6rem; }
+  li { padding-left:1.1rem; position:relative; color:var(--fg0); }
+  li::before { content:"—"; position:absolute; left:0; color:var(--fg1); }
+  .map li em { font-style:normal; color:var(--fg1); }
+  .k-cool{color:var(--blue)} .k-warm{color:var(--orange)} .k-purple{color:var(--purple)} .k-red{color:var(--red)}
 
-  .arrow { color: var(--green); font-family: var(--font-mono); font-weight: 700; }
-
-  .tablewrap { overflow-x: auto; margin: 1.2rem 0 1.6rem; border: 1px solid var(--bg2); border-radius: 8px; }
-  table { border-collapse: collapse; width: 100%; font-family: var(--font-mono); font-size: .78rem; }
-  caption { text-align: left; font-family: var(--font-mono); font-size: .82rem; color: var(--fg1); padding: .7rem .9rem; background: var(--bg1); border-bottom: 1px solid var(--bg2); }
-  th, td { text-align: left; padding: .4rem .7rem; border-bottom: 1px solid var(--bg1); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  th { color: var(--fg1); font-weight: 700; }
-  tbody tr:last-child td { border-bottom: none; }
-  .sw { display: inline-block; width: .85rem; height: .85rem; border-radius: 2px; border: 1px solid var(--bg2); vertical-align: -1px; margin-right: .45rem; }
-  .pass { color: var(--green); }
-  .warn { color: var(--orange); }
-
-  blockquote { margin: 1.2rem 0; padding: .3rem 0 .3rem 1.1rem; border-left: 3px solid var(--teal); color: var(--fg0); font-style: italic; }
-
-  .callout { background: var(--bg1); border: 1px solid var(--bg2); border-radius: 8px; padding: 1rem 1.2rem; margin: 1.4rem 0; }
-  .callout p:last-child { margin-bottom: 0; }
-  .label { font-family: var(--font-mono); font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--teal); display: block; margin-bottom: .4rem; }
-
-  footer { margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--bg2); font-family: var(--font-mono); font-size: .78rem; color: var(--fg1); }
-  footer a { color: var(--fg1); }
-
-  .refs { font-size: .92rem; }
-  .refs li { margin-bottom: .7rem; }
+  footer { margin-top:3.5rem; padding-top:1.4rem; border-top:1px solid var(--bg2); font-family:var(--mono); font-size:.78rem; color:var(--fg1); display:flex; gap:1rem; flex-wrap:wrap; justify-content:space-between; }
+  footer a { color:var(--fg1); }
+  footer a:hover { color:var(--fg0); }
+  .refs { font-size:.95rem; color:var(--fg1); }
+  .refs a { color:var(--fg1); } .refs a:hover { color:var(--fg0); }
 </style>
 </head>
 <body>
@@ -134,332 +108,71 @@
   <a class="navlink" href="/#ports">Ports</a>
   <a class="navlink current" href="/ideas">The ideas</a>
   <a class="navlink" href="https://github.com/w0zro/datum">GitHub</a>
-  <button class="toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Toggle theme"></button>
+  <button class="toggle" id="themeToggle" type="button" aria-label="Toggle theme"></button>
 </div></nav>
+
 <main>
-  <p class="dek">a living design document — when the palette changes, this changes with it</p>
-  <h1>Designing&nbsp;datum</h1>
-  <p class="lede">A light and dark colorscheme derived from color science rather than taste.</p>
-  <p>A colorscheme has two hard jobs and one easy one. The easy job is looking nice in a
-  screenshot. The hard jobs are <em>being legible for hours</em> — across two backgrounds, for eyes
-  that differ — and <em>meaning something</em>, using color to encode structure rather than smearing
-  it around as decoration. Most schemes are tuned by nudging hex values until a sample file looks
-  right on the author's monitor. This one is derived from published research, and every color below
-  has a reason and a measured number attached to it. This page is styled with the palette it
-  documents; toggle the theme to see both.</p>
+  <p class="dek">the thinking behind datum · a living doc — changes when the palette does</p>
+  <h1>The ideas</h1>
+  <p class="lede">datum isn't picked, it's <em>derived</em>. Here's the short version of why every color sits where it does.</p>
 
-  <h2 id="findings"><span class="n">1</span>The research</h2>
-  <p>Eleven findings drive the design. The first six are about legibility; the rest are about
-  <em>which colors</em> and <em>how loud</em>.</p>
+  <h2>The whole trick</h2>
+  <p>Every token gets a color — but how <em>loud</em> that color is tracks how <em>often</em> the token shows up. The rare, meaningful stuff (strings, numbers, constants, types, definitions) runs at full chroma. The ~75% that's just glue — variables, calls, parameters, operators — gets a quieter version of the <em>same</em> hue. Colorful, without turning into soup.</p>
 
-  <h3>1.1 &nbsp;Design in a perceptually uniform space — OKLCH</h3>
-  <p><code>sRGB</code> and <code>HSL</code> are perceptually non-uniform: two colors with the same
-  HSL "lightness" can differ wildly in apparent brightness. Björn Ottosson's <strong>OKLCH</strong>
-  (2020) separates Lightness, Chroma and Hue so that equal L <em>looks</em> equally bright. Give a
-  set of accents the same L and they read as a family. <span class="arrow">→</span> We design every
-  color in OKLCH and export sRGB hex.</p>
+  <h2>Derived, not vibed</h2>
+  <p>The colors fall out of a script, not my eyeballs. They live in <b>OKLCH</b>, so "equally bright" actually means equally bright. Every one clears <b>WCAG&nbsp;4.5:1</b> plus an APCA check, then the whole set runs through a <b>colorblindness simulator</b>. When a color fails, the math says so and I move it — no guessing. The receipts are on the <a href="/#palette">palette page</a>, computed live in your browser.</p>
 
-  <h3>1.2 &nbsp;Keep hue identity, mirror lightness — the Solarized lesson</h3>
-  <p>Ethan Schoonover's <strong>Solarized</strong> was built in CIELAB with <em>symmetric</em>
-  lightness relationships, so switching modes preserves the perceived contrast between tones, and its
-  accents keep fixed hues across both modes. <span class="arrow">→</span> A color's hue <em>angle</em>
-  is identical in light and dark mode; only its lightness and chroma change per background.</p>
+  <h2>Which colors, and why</h2>
+  <p>The hues come from <a href="https://conceptviz.app/blog/okabe-ito-palette-hex-codes-complete-reference">Okabe–Ito</a>, a set built to stay distinct for colorblind folks. The mapping has a story:</p>
+  <ul class="map">
+    <li><b class="k-cool">cool</b> = how the code is <em>built</em> — keywords, types, strings</li>
+    <li><b class="k-warm">warm</b> = the <em>data</em> running through it — numbers, constants</li>
+    <li><b class="k-purple">purple</b> = stuff you <em>named</em> — functions, constants</li>
+    <li><b class="k-red">red</b> = stuff that's <em>broken</em> — errors only, so it never gets spent on syntax</li>
+  </ul>
 
-  <h3>1.3 &nbsp;Dark backgrounds are not black; light backgrounds are not white</h3>
-  <p>Pure <code>#000</code> with light text causes <strong>halation</strong> — a haloing that readers
-  with astigmatism experience as smearing — plus harsh fatigue; the field standard is a soft
-  near-black around <code>#121212</code>. Pure <code>#fff</code> is a glare source.
-  <span class="arrow">→</span> Dark <code>bg0</code> sits at OKLCH L&nbsp;0.18, light <code>bg0</code>
-  at L&nbsp;0.97; both carry a faint cool bias — a <em>chosen</em> neutral.</p>
+  <h2>Light and dark aren't opposites</h2>
+  <p>A dark theme isn't a light one flipped upside down — that reads wrong, because your eyes don't work that way. Same hue in both modes, but lightness and chroma retuned for the background. Light green is a deep pine; dark green a bright mint. Still the same "green." Hit the ☀/☾ up top to watch it swap.</p>
 
-  <h3>1.4 &nbsp;A dark theme is not an inverted light theme</h3>
-  <p>Two perceptual effects break naive inversion. <strong>Simultaneous contrast</strong> makes the
-  same swatch look dimmer on near-black than on white. The <strong>Bezold–Brücke hue shift</strong>
-  drifts perceived hue as luminance changes. The practical rule: dark-mode colors need a chroma
-  boost of roughly 15–25&nbsp;% and sometimes a hue nudge to feel equivalent.
-  <span class="arrow">→</span> Dark accents are re-derived at their own L/C, not the light colors
-  re-plotted.</p>
+  <h2>Where it's honest</h2>
+  <ul>
+    <li>In <b>light mode</b> the warm colors crowd a bit under red-green colorblindness. That's physics — you can't have three distinct warm hues that are all dark enough to read on near-white. Low stakes, though: a <code>42</code> and a <code>MAX_RETRIES</code> are obvious without the color.</li>
+    <li>The tiers lean on <b>Tree-sitter</b> (in Neovim) to tell a function <em>call</em> from a <em>definition</em>. Without it, some of the quiet tier just falls back to plain text — still readable, just less color.</li>
+    <li>A <b>256-color terminal</b> flattens the off-white to plain white. Truecolor gets the real hexes.</li>
+    <li>It goes <b>maximal on color</b> on purpose. Want calmer? That's a config tweak away, not a rewrite.</li>
+  </ul>
 
-  <h3>1.5 &nbsp;Contrast — WCAG 2.2 as the floor, APCA as the gauge</h3>
-  <p>The WCAG 2.x ratio (4.5:1 body, 3:1 large/UI) is the accessibility floor, but its maths is
-  unreliable near black — exactly the dark-mode regime. <strong>APCA</strong> (candidate method for
-  WCAG&nbsp;3) reports a perceptual lightness-contrast <code>Lc</code> that means the same thing
-  across the whole range and treats dark-on-light and light-on-dark differently, as the eye does.
-  <span class="arrow">→</span> Every foreground clears WCAG&nbsp;4.5:1 <em>and</em> is tuned by APCA
-  (target <code>Lc&nbsp;≥&nbsp;60</code> for frequent text, <code>≥&nbsp;45</code> for accents and
-  comments).</p>
+  <h2>Under the hood</h2>
+  <p>One file — <a href="https://github.com/w0zro/datum/blob/main/tools/derive.py"><code>tools/derive.py</code></a> — is the source of truth. It emits the palette as JSON, and every port (Ghostty, Kitty, WezTerm, VS&nbsp;Code, tmux, fzf, the shell, all of them) is generated from it. Change a color once and everything follows, so nothing drifts.</p>
 
-  <h3>1.6 &nbsp;Positive polarity is the sharper mode</h3>
-  <p>Piepenbrock, Mayr &amp; Buchner found a consistent <strong>positive-polarity advantage</strong>:
-  people read faster and proofread more accurately with dark text on a light background, at every age,
-  because a light background keeps the pupil constricted — increasing depth of field and reducing the
-  impact of astigmatism. Yet dark mode is preferred in dim light and eases the halation glow. There is
-  no universal winner. <span class="arrow">→</span> Light mode is the acuity mode, not an afterthought;
-  both get first-class tuning.</p>
-
-  <h3>1.7 &nbsp;Which hues read best flips with the background</h3>
-  <p>On dark grounds the high-luminance hues (yellow, green, cyan) read best while saturated blue and
-  violet read worst; on white it inverts — blue, red and violet read well, and yellow reads worst
-  because its high luminance leaves too little contrast. This is luminance, not taste.
-  <span class="arrow">→</span> It is <em>why</em> the two modes can't share colors and why light-mode
-  "yellow" must become a dark olive. Frequent tokens skew warm/high-luminance in dark, cool in light.</p>
-
-  <h3>1.8 &nbsp;Saturated blue text is hard to focus — chromostereopsis</h3>
-  <p>Because the eye refracts short wavelengths more, blue focuses slightly in front of the retina and
-  red behind it, so saturated blue text sits at the wrong focal plane and a saturated red beside a
-  saturated blue produces a depth shimmer. The fixes are to desaturate and to avoid adjacency.
-  <span class="arrow">→</span> Keyword-blue is kept gently desaturated, and a saturated error-red never
-  butts directly against it.</p>
-
-  <h3>1.9 &nbsp;A data-derived hue set — Okabe–Ito</h3>
-  <p>Okabe &amp; Ito's eight-color qualitative palette (popularized by Bang Wong in <em>Nature
-  Methods</em>, 2011) is the de facto scientific standard: engineered from the start to stay distinct
-  under protanopia, deuteranopia <em>and</em> tritanopia, with deliberately distinct luminance per
-  hue. <span class="arrow">→</span> Rather than pick arbitrary evenly-spaced hues, datum anchors its
-  hue <em>angles</em> on the Okabe–Ito set and moves only L/C per background. Its hues map almost
-  one-to-one onto our roles.</p>
-  <div class="callout">
-    <span class="label">the mapping</span>
-    <p style="margin:0"><span class="mono">blue</span> <span class="arrow">→</span> keywords &middot;
-    <span class="mono">orange</span> <span class="arrow">→</span> numbers/values &middot;
-    <span class="mono">bluish-green</span> <span class="arrow">→</span> strings &middot;
-    <span class="mono">reddish-purple</span> <span class="arrow">→</span> constants &amp; function
-    definitions &middot; <span class="mono">vermillion</span> <span class="arrow">→</span> errors.
-    Types take a <span class="mono">teal</span> placed between string-green and keyword-blue, because
-    Okabe–Ito's sky-blue sits only 8° from its blue and the two collapse once both are dark enough for
-    white-background contrast (finding&nbsp;1.7).</p>
-  </div>
-
-  <h3>1.10 &nbsp;Color intensity should be inverse to token frequency</h3>
-  <p>Early work (Baecker &amp; Gilmore) found color cues could improve readability up to ~25&nbsp;%,
-  but practice since (Alabaster; tonsky's <em>everyone is getting syntax highlighting wrong</em>)
-  observes that <em>if everything is highlighted, nothing is</em>. The usual reading of that — "color
-  fewer tokens" — throws away color many people genuinely enjoy staring at all day. But the underlying
-  principle isn't about the <em>presence</em> of color, it's about <em>intensity</em>: a token's
-  loudness should be inverse to how often it appears. That is satisfiable with saturation instead of
-  on/off. <span class="arrow">→</span> <strong>Chroma-tiering.</strong> Every token carries a hue, but
-  intensity encodes frequency. The sparse reference points (strings, numbers, constants, types,
-  definitions) run at full chroma — saturated mid-tones. The ubiquitous glue (variables, function
-  <em>calls</em>, parameters, operators — ~75&nbsp;% of the text) shares those same hues but is pushed
-  to a lightness near the foreground: that both separates it from its full-chroma sibling on the
-  CVD-safe lightness channel (§1.11) <em>and</em> softens it to a pastel, because the sRGB gamut narrows
-  near white. Pure punctuation and comments stay neutral; keywords are colored but not bold. The screen
-  reads as vividly colored, yet the eye still gets a loud/quiet hierarchy.</p>
-
-  <h3>1.11 &nbsp;Color-vision deficiency is not an edge case</h3>
-  <p>Some form of color-vision deficiency affects roughly 8&nbsp;% of men and 0.5&nbsp;% of women —
-  the common red-green types are X-linked recessive, which is why prevalence skews male, but it is
-  everyone's concern, not a men-only one. The blue↔orange axis survives it, and lightness differences
-  survive <em>every</em> kind. <span class="arrow">→</span>
-  <strong>CVD-aware:</strong> keep the full hue range, but put the load-bearing contrast on blue/orange
-  and separate any two co-occurring token colors by lightness. This is also exactly what lets the two
-  chroma tiers (§1.10) coexist: a glue color and its full-chroma sibling share a hue, so <em>only</em>
-  the lightness gap tells them apart — and lightness is the one channel no CVD collapses. Validated by
-  simulating all three CVD types (Machado et al. 2009).</p>
-
-  <h2 id="pipeline"><span class="n">2</span>The derivation pipeline</h2>
-  <p>The palette is generated by a script (<a href="https://github.com/w0zro/datum/blob/main/tools/derive.py"><code>tools/derive.py</code></a>,
-  pure stdlib), not hand-picked, so the numbers below are reproducible.</p>
-  <ol>
-    <li><strong>Neutrals first.</strong> Fix dark <code>bg0</code> at L&nbsp;0.18 and light at
-    L&nbsp;0.97, then derive the tonal ramp at mirrored lightness steps so both modes share a contrast
-    structure.</li>
-    <li><strong>Anchor the accent hues once</strong> on the Okabe–Ito angles (§1.9); these are shared
-    by both modes.</li>
-    <li><strong>Tune lightness &amp; chroma per background.</strong> Dark accents high-L and
-    chroma-boosted; light accents low-L to clear 4.5:1 on the off-white. Co-occurring pairs are pushed
-    apart in L for CVD; blue stays gently desaturated (§1.8). These are tier&nbsp;1.</li>
-    <li><strong>Derive the glue tier.</strong> For each glue role, take its full-chroma sibling's hue
-    and push the lightness toward the foreground — high in dark, low in light — yielding a quieter tone that
-    (a) reads quiet, (b) separates from the sibling on the CVD-safe channel, and (c) as body text keeps
-    the higher contrast. This is tier&nbsp;2.</li>
-    <li><strong>Verify &amp; iterate.</strong> Compute WCAG and APCA for every pair, simulate the three
-    CVD types over all eleven colors, and adjust L/C — never the shared hue anchors — until the targets
-    pass.</li>
-    <li><strong>Quantize to cterm-256</strong> for terminals without truecolor, noting where the
-    approximation diverges.</li>
-  </ol>
-
-  <h2 id="palette"><span class="n">3</span>The palette</h2>
-  <p>OKLCH is the design source; hex is the sRGB export; cterm is the 256-color fallback. WCAG and
-  APCA are measured against that mode's <code>bg0</code>. The modes are not inversions of each other —
-  same hue angle, different lightness and chroma.</p>
-
-  <div class="tablewrap">
-  <table>
-    <caption>Dark — soft near-black, bg0 #0f1318 &nbsp;·&nbsp; tier 1 = full chroma, tier 2 = the glue</caption>
-    <thead><tr><th>role</th><th>hex</th><th>cterm</th><th>L&nbsp;/&nbsp;C&nbsp;/&nbsp;H</th><th>WCAG</th><th>APCA</th></tr></thead>
-    <tbody>
-      <tr><td><span class="sw" style="background:#181c21"></span>bg1 cursorline</td><td>#181c21</td><td>234</td><td>0.22 / .011 / 254</td><td>—</td><td>—</td></tr>
-      <tr><td><span class="sw" style="background:#2b2f35"></span>bg2 selection</td><td>#2b2f35</td><td>236</td><td>0.30 / .012 / 258</td><td>—</td><td>—</td></tr>
-      <tr><td><span class="sw" style="background:#8f98a3"></span>fg1 comments</td><td>#8f98a3</td><td>246</td><td>0.68 / .019 / 253</td><td>6.4</td><td>46</td></tr>
-      <tr><td><span class="sw" style="background:#dbe0e8"></span>fg0 text</td><td>#dbe0e8</td><td>254</td><td>0.91 / .012 / 260</td><td>14.1</td><td>87</td></tr>
-      <tr><td><span class="sw" style="background:#ef844a"></span>red · errors</td><td>#ef844a</td><td>209</td><td>0.72 / .150 / 47</td><td class="pass">7.2</td><td>51</td></tr>
-      <tr><td><span class="sw" style="background:#e6ac4c"></span>orange · numbers</td><td>#e6ac4c</td><td>179</td><td>0.78 / .130 / 77</td><td class="pass">9.2</td><td>63</td></tr>
-      <tr><td><span class="sw" style="background:#d8cf58"></span>yellow · constants, UI</td><td>#d8cf58</td><td>185</td><td>0.84 / .140 / 105</td><td class="pass">11.5</td><td>75</td></tr>
-      <tr><td><span class="sw" style="background:#51daa7"></span>green · strings</td><td>#51daa7</td><td>79</td><td>0.80 / .140 / 165</td><td class="pass">10.6</td><td>70</td></tr>
-      <tr><td><span class="sw" style="background:#5ddae0"></span>teal · types</td><td>#5ddae0</td><td>80</td><td>0.82 / .110 / 200</td><td class="pass">11.2</td><td>73</td></tr>
-      <tr><td><span class="sw" style="background:#66b6f4"></span>blue · keywords</td><td>#66b6f4</td><td>75</td><td>0.75 / .120 / 244</td><td class="pass">8.5</td><td>59</td></tr>
-      <tr><td><span class="sw" style="background:#db78b1"></span>purple · function defs</td><td>#db78b1</td><td>175</td><td>0.70 / .140 / 346</td><td class="pass">6.5</td><td>47</td></tr>
-      <tr><td><span class="sw" style="background:#fcdcad"></span>var · variables <span style="color:var(--fg1)">(← orange)</span></td><td>#fcdcad</td><td>223</td><td>0.91 / .070 / 77</td><td class="pass">14.2</td><td>88</td></tr>
-      <tr><td><span class="sw" style="background:#f5b9d9"></span>call · function calls <span style="color:var(--fg1)">(← purple)</span></td><td>#f5b9d9</td><td>218</td><td>0.85 / .080 / 346</td><td class="pass">11.4</td><td>74</td></tr>
-      <tr><td><span class="sw" style="background:#a5f5f9"></span>param · parameters <span style="color:var(--fg1)">(← teal)</span></td><td>#a5f5f9</td><td>159</td><td>0.92 / .078 / 200</td><td class="pass">15.1</td><td>92</td></tr>
-      <tr><td><span class="sw" style="background:#b2dafb"></span>op · operators <span style="color:var(--fg1)">(← blue)</span></td><td>#b2dafb</td><td>153</td><td>0.87 / .062 / 244</td><td class="pass">12.7</td><td>81</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <div class="tablewrap">
-  <table>
-    <caption>Light — off-white, bg0 #f1f6fd &nbsp;·&nbsp; glue goes dark here (it is the body text)</caption>
-    <thead><tr><th>role</th><th>hex</th><th>cterm</th><th>L&nbsp;/&nbsp;C&nbsp;/&nbsp;H</th><th>WCAG</th><th>APCA</th></tr></thead>
-    <tbody>
-      <tr><td><span class="sw" style="background:#e7ecf2"></span>bg1 cursorline</td><td>#e7ecf2</td><td>255</td><td>0.94 / .010 / 253</td><td>—</td><td>—</td></tr>
-      <tr><td><span class="sw" style="background:#ced3d9"></span>bg2 selection</td><td>#ced3d9</td><td>252</td><td>0.86 / .010 / 253</td><td>—</td><td>—</td></tr>
-      <tr><td><span class="sw" style="background:#616a76"></span>fg1 comments</td><td>#616a76</td><td>242</td><td>0.52 / .022 / 256</td><td class="pass">5.1</td><td>72</td></tr>
-      <tr><td><span class="sw" style="background:#292e35"></span>fg0 text</td><td>#292e35</td><td>236</td><td>0.30 / .015 / 257</td><td class="pass">12.6</td><td>95</td></tr>
-      <tr><td><span class="sw" style="background:#a44602"></span>red · errors</td><td>#a44602</td><td>130</td><td>0.51 / .141 / 47</td><td class="pass">5.6</td><td>74</td></tr>
-      <tr><td><span class="sw" style="background:#976700"></span>orange · numbers</td><td>#976700</td><td>94</td><td>0.55 / .115 / 77</td><td class="pass">4.5</td><td>68</td></tr>
-      <tr><td><span class="sw" style="background:#756f1d"></span>yellow · constants, UI</td><td>#756f1d</td><td>94</td><td>0.53 / .100 / 105</td><td class="pass">4.8</td><td>70</td></tr>
-      <tr><td><span class="sw" style="background:#107c5a"></span>green · strings</td><td>#107c5a</td><td>29</td><td>0.52 / .105 / 165</td><td class="pass">4.8</td><td>70</td></tr>
-      <tr><td><span class="sw" style="background:#0b7b80"></span>teal · types</td><td>#0b7b80</td><td>30</td><td>0.53 / .088 / 200</td><td class="pass">4.7</td><td>69</td></tr>
-      <tr><td><span class="sw" style="background:#0068a4"></span>blue · keywords</td><td>#0068a4</td><td>25</td><td>0.50 / .124 / 244</td><td class="pass">5.5</td><td>74</td></tr>
-      <tr><td><span class="sw" style="background:#983472"></span>purple · function defs</td><td>#983472</td><td>95</td><td>0.49 / .150 / 346</td><td class="pass">6.3</td><td>77</td></tr>
-      <tr><td><span class="sw" style="background:#4d3919"></span>var · variables <span style="color:var(--fg1)">(← orange)</span></td><td>#4d3919</td><td>236</td><td>0.36 / .055 / 77</td><td class="pass">10.1</td><td>90</td></tr>
-      <tr><td><span class="sw" style="background:#633750"></span>call · function calls <span style="color:var(--fg1)">(← purple)</span></td><td>#633750</td><td>239</td><td>0.40 / .072 / 346</td><td class="pass">8.8</td><td>86</td></tr>
-      <tr><td><span class="sw" style="background:#154b4e"></span>param · parameters <span style="color:var(--fg1)">(← teal)</span></td><td>#154b4e</td><td>23</td><td>0.38 / .055 / 200</td><td class="pass">9.0</td><td>87</td></tr>
-      <tr><td><span class="sw" style="background:#2f516c"></span>op · operators <span style="color:var(--fg1)">(← blue)</span></td><td>#2f516c</td><td>239</td><td>0.42 / .060 / 244</td><td class="pass">7.7</td><td>83</td></tr>
-    </tbody>
-  </table>
-  </div>
-  <p>Every one of the eleven syntax colors clears WCAG&nbsp;4.5:1 in both modes; light <code>orange</code>
-  at 4.5 is the tightest. The two tiers invert their lightness by mode: in dark the glue is a bright
-  pastel and the accents are saturated mid-tones; in light the glue goes <em>dark</em> (it is the body
-  text, so it should hold the higher contrast) while the accents stay mid. And the modes are genuinely
-  different colors, not inversions — light <code>green</code> is a deep pine, dark <code>green</code> a
-  bright mint, same 165° hue.</p>
-
-  <h2 id="cvd"><span class="n">4</span>Color-vision-deficiency validation</h2>
-  <p>Each CVD type is simulated (Machado 2009, severity&nbsp;1.0) and we measure the
-  <strong>minimum pairwise Oklab distance</strong> across all <strong>eleven</strong> syntax colors
-  (both tiers) — how close the two most similar colors become. Larger is safer.</p>
-  <div class="tablewrap">
-  <table>
-    <caption>min pairwise distance over all 11 colors — larger is safer</caption>
-    <thead><tr><th>mode</th><th>normal</th><th>protanopia</th><th>deuteranopia</th><th>tritanopia</th></tr></thead>
-    <tbody>
-      <tr><td>dark</td><td>0.073</td><td>0.039</td><td>0.047</td><td>0.025</td></tr>
-      <tr><td>light</td><td>0.058</td><td>0.007</td><td>0.020</td><td>0.016</td></tr>
-    </tbody>
-  </table>
-  </div>
-  <p><strong>Read honestly — this is the real cost of maximal color.</strong> Eleven colors on seven
-  CVD-safe hues is a crowded wheel: the worst-case separation is far tighter than a restrained palette
-  would be (a pre-tier version of datum cleared 0.076 under deuteranopia; this clears 0.047). Two things
-  keep it honest. First, the tier split rides <em>lightness</em>, which no CVD collapses, so a glue
-  color never merges with its own full-chroma sibling — the loud/quiet distinction always survives.
-  Second, the tightest residual pairs are low-stakes: in light mode <code>orange</code>↔<code>yellow</code>
-  (numbers vs constants) compress to 0.007 under protanopia, but a numeric literal and a
-  <code>SCREAMING_CASE</code> constant are never confusable by anything but color. The high-frequency,
-  high-stakes distinctions — comment vs code, string vs everything, keyword vs variable — all ride the
-  blue/green/neutral axis, which stays clear under the common red-green types. This is a deliberate
-  trade of headroom for color; the restrained palette is one config change away for anyone who wants
-  it back.</p>
-
-  <h2 id="assignment"><span class="n">5</span>Token → color assignment</h2>
-  <p>Full chroma marks the sparse reference points; the quiet tier marks the glue that refers to them.</p>
-  <div class="tablewrap">
-  <table>
-    <caption>tier 1 — full chroma (the reference points)</caption>
-    <thead><tr><th>Tree-sitter / Vim group</th><th>color</th><th>why</th></tr></thead>
-    <tbody>
-      <tr><td>@string, String</td><td>green</td><td>sparse, high-value literals</td></tr>
-      <tr><td>@number, @boolean, Number, Float</td><td>orange</td><td>literal values, warm end of the CVD axis</td></tr>
-      <tr><td>@constant, Constant</td><td>yellow</td><td>named values (warm = values); rare, so it can take the CVD-risky warm slot</td></tr>
-      <tr><td>@type, Type, StorageClass</td><td>teal</td><td>the type layer, one cool step from strings</td></tr>
-      <tr><td>@function, @constructor, Function</td><td>purple</td><td>definition sites — the named things</td></tr>
-      <tr><td>@keyword, Statement, Conditional</td><td>blue, not bold</td><td>grammar; desaturated per §1.8, recessive</td></tr>
-      <tr><td>@exception, Error, WarningMsg</td><td>red</td><td>the alarm channel, reinforced with attributes not color alone</td></tr>
-      <tr><td>Search, CursorLineNr, Title</td><td>yellow</td><td>UI highlights — reuses the constant hue</td></tr>
-    </tbody>
-  </table>
-  </div>
-  <div class="tablewrap">
-  <table>
-    <caption>tier 2 — the glue (the ubiquitous ~75% of the text)</caption>
-    <thead><tr><th>Tree-sitter group</th><th>color</th><th>why</th></tr></thead>
-    <tbody>
-      <tr><td>@variable, @variable.member, @property</td><td>var <span style="color:var(--fg1)">(← orange)</span></td><td>a value being used — orange, softened</td></tr>
-      <tr><td>@variable.parameter</td><td>param <span style="color:var(--fg1)">(← teal)</span></td><td>a typed input — teal, softened</td></tr>
-      <tr><td>@function.call, @function.builtin</td><td>call <span style="color:var(--fg1)">(← purple)</span></td><td>a reference to a defined function — purple, softened</td></tr>
-      <tr><td>@operator, @keyword.operator</td><td>op <span style="color:var(--fg1)">(← blue)</span></td><td>a search cue for = == |&gt; (§5.1); grammar, softened</td></tr>
-    </tbody>
-  </table>
-  </div>
-  <p>Neutral, deliberately: <code>@punctuation.bracket</code> and <code>@punctuation.delimiter</code>
-  drop to <code>fg1</code>, and <code>Comment</code> is <code>fg1</code> italic. Pure punctuation is the
-  one thing that earns <em>less</em> than plain text — which is what lets the color around it read
-  louder.</p>
-  <p class="mono" style="font-size:.82rem;color:var(--fg1)">" the story: cool is how the code is built,
-  warm is the data running through it, purple is what you named, red is what's broken — and each glue color
-  is the quiet reference to its full-chroma thing.</p>
-
-  <h3>5.1 &nbsp;Two dependencies worth stating plainly</h3>
-  <p><strong>The tiers need Tree-sitter.</strong> Base Vim regex syntax cannot tell a function
-  <em>definition</em> from a <em>call</em>, and never populates <code>@variable</code>,
-  <code>@operator</code>, or <code>@punctuation</code> at all. Under regex highlighting the quiet tier
-  simply doesn't appear — calls, variables and operators fall back to <code>fg0</code>. Tree-sitter's
-  captures (<code>@function.call</code> vs <code>@function</code>, etc.) are what make the loud/quiet
-  split real, so datum is authored against them and the config starts Tree-sitter wherever a parser
-  exists.</p>
-  <p><strong>Operators earn their color on evidence.</strong> They are frequent, so §1.10 would leave
-  them quiet — which the quiet tier does. But the one replicable benefit of coloring a token class is
-  <em>targeted visual search</em>: color gives no speed-up when the target's color is unknown, but a
-  considerable one when it is known and consistent (Sarkar 2015; Beelders &amp; du Plessis eye-tracking).
-  A stable, quiet operator color turns "find the assignment / the comparison / the pipeline" into a
-  color-pop search without adding noise — exactly what a quiet tone in the keyword-blue family delivers.</p>
-
-  <h2 id="repro"><span class="n">6</span>Reproducing &amp; changing the palette</h2>
-  <p>The script <a href="https://github.com/w0zro/datum/blob/main/tools/derive.py"><code>tools/derive.py</code></a>
-  (<code>python3 tools/derive.py</code>) is the source of truth for these numbers. To change a color:
-  adjust its OKLCH L/C (or, rarely, the shared hue anchor) in the script, re-run the verification,
-  confirm the §1.5 targets and §4 CVD separation still hold, then update
-  <code>colors/datum.vim</code>, the tables in §3, and the CVD table in §4 <em>in the same change</em>.
-  This document is only trustworthy if it moves in lockstep with the palette.</p>
-
-  <h2 id="refs"><span class="n">7</span>References</h2>
-  <ol class="refs">
-    <li>Björn Ottosson, <em>Oklab / OKLCH</em> (2020) — <a href="https://bottosson.github.io/posts/oklab/">bottosson.github.io/posts/oklab</a>.</li>
-    <li>Ethan Schoonover, <em>Solarized</em> — <a href="https://ethanschoonover.com/solarized/">ethanschoonover.com/solarized</a>.</li>
-    <li>Dark-mode halation &amp; soft-black — Smashing Magazine, <em>Inclusive Dark Mode</em> (2025) — <a href="https://www.smashingmagazine.com/2025/04/inclusive-dark-mode-designing-accessible-dark-themes/">smashingmagazine.com</a>.</li>
-    <li>Bezold–Brücke shift — <a href="https://en.wikipedia.org/wiki/Bezold%E2%80%93Br%C3%BCcke_shift">en.wikipedia.org</a>.</li>
-    <li>APCA / Myndex — <a href="https://git.apcacontrast.com/documentation/APCA_in_a_Nutshell.html">apcacontrast.com</a>.</li>
-    <li>Piepenbrock, Mayr &amp; Buchner, <em>Positive display polarity is advantageous…</em> (2013) — <a href="https://www.psychologie.hhu.de/fileadmin/redaktion/Oeffentliche_Medien/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Psychologie/AAP/Publikationen/2013/Piepenbrock-2013-Positive_display_polarity_is_.pdf">hhu.de (PDF)</a>; NN/g, <em>Dark Mode vs. Light Mode</em> — <a href="https://www.nngroup.com/articles/dark-mode/">nngroup.com</a>.</li>
-    <li>Hue × luminance legibility — <a href="https://www.uxmatters.com/mt/archives/2007/01/applying-color-theory-to-digital-displays.php">UXmatters, Applying Color Theory to Digital Displays</a>.</li>
-    <li>Chromostereopsis — <a href="https://en.wikipedia.org/wiki/Chromostereopsis">en.wikipedia.org</a>.</li>
-    <li>Okabe &amp; Ito palette; Wong, <em>Points of View: Color blindness</em>, Nature Methods (2011) — <a href="https://conceptviz.app/blog/okabe-ito-palette-hex-codes-complete-reference">reference</a>.</li>
-    <li>tonsky, <em>Everyone is getting syntax highlighting wrong</em> — <a href="https://tonsky.me/blog/syntax-highlighting/">tonsky.me</a>; Alabaster — <a href="https://github.com/tonsky/vscode-theme-alabaster">github.com/tonsky</a>.</li>
-    <li>Machado, Oliveira &amp; Fernandes, <em>A Physiologically-based Model for Simulation of Color Vision Deficiency</em> (2009).</li>
-  </ol>
+  <h2>Go deeper</h2>
+  <p class="refs">The research it leans on:
+  <a href="https://bottosson.github.io/posts/oklab/">OKLCH (Ottosson)</a> ·
+  <a href="https://ethanschoonover.com/solarized/">Solarized</a> ·
+  <a href="https://git.apcacontrast.com/documentation/APCA_in_a_Nutshell.html">APCA</a> ·
+  <a href="https://conceptviz.app/blog/okabe-ito-palette-hex-codes-complete-reference">Okabe–Ito / Wong</a> ·
+  <a href="https://www.nngroup.com/articles/dark-mode/">light vs dark reading</a> ·
+  <a href="https://tonsky.me/blog/syntax-highlighting/">tonsky on syntax highlighting</a>.</p>
 
   <footer>
-    w0zro/datum &middot; MIT &middot; <a href="/">palette &amp; live preview</a>
+    <span>datum · MIT · derived from color science</span>
+    <span><a href="/">← back to datum</a></span>
   </footer>
 </main>
+
 <script>
+  var SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>';
   function currentMode() {
     var a = document.documentElement.getAttribute('data-theme');
     if (a) return a;
     return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   }
-  var SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
-  var MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>';
   function setMode(m) {
     document.documentElement.setAttribute('data-theme', m);
     var t = document.getElementById('themeToggle');
     t.innerHTML = m === 'dark' ? MOON : SUN;
     t.setAttribute('aria-label', 'Switch to ' + (m === 'dark' ? 'light' : 'dark') + ' theme');
-    t.setAttribute('aria-pressed', String(m === 'dark'));
   }
   document.getElementById('themeToggle').addEventListener('click', function () {
     setMode(currentMode() === 'dark' ? 'light' : 'dark');

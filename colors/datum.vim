@@ -18,7 +18,7 @@ endif
 " keyword-blue. Derived in OKLCH, verified for WCAG 2.2 (>=4.5:1) and APCA,
 " validated against protan/deutan/tritan simulation. Hue angle is shared
 " across both modes (hue identity); only lightness and chroma differ per
-" background. Each entry is [cterm256, guihex]. See docs/ideas.html for
+" background. Each entry is [cterm256, guihex]. See datum.w0zro.com/ideas for
 " the full methodology, per-color L/C/H, and measured contrast numbers.
 
 if &background ==# 'light'
@@ -99,7 +99,7 @@ call s:hi('EndOfBuffer', s:bg0, s:bg0)
 " (strings, numbers, constants, functions) run at full chroma; the ubiquitous
 " glue (variables, operators) is tinted but quiet; pure punctuation and
 " comments stay neutral. Warm = values, cool = grammar, purple = what you
-" defined, red = what's broken. See docs/ideas.html for the rationale.
+" defined, red = what's broken. See datum.w0zro.com/ideas for the rationale.
 
 call s:hi('Comment', s:fg1, [], 'italic')
 
