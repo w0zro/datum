@@ -1,0 +1,13 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- datum mark: the ◆ glyph cut into eight facets, one per palette hue, on bg0.
+       Source of truth for every avatar/icon. Regenerate PNGs from this. -->
+  <rect width="256" height="256" fill="#0f1318"/>
+  <polygon points="128,128 128,40 172,84"  fill="#d8cf58"/>
+  <polygon points="128,128 172,84 216,128"  fill="#51daa7"/>
+  <polygon points="128,128 216,128 172,172" fill="#5ddae0"/>
+  <polygon points="128,128 172,172 128,216" fill="#66b6f4"/>
+  <polygon points="128,128 128,216 84,172"  fill="#db78b1"/>
+  <polygon points="128,128 84,172 40,128"   fill="#f5b9d9"/>
+  <polygon points="128,128 40,128 84,84"    fill="#ef844a"/>
+  <polygon points="128,128 84,84 128,40"    fill="#e6ac4c"/>
+</svg>
