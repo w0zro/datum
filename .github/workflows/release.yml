@@ -1,0 +1,65 @@
+name: release
+
+# Tag a version to publish the VS Code extension, e.g.:
+#   git tag v0.2.0 && git push origin v0.2.0
+#
+# Requires two repo secrets (Settings -> Secrets and variables -> Actions):
+#   VSCE_PAT  -- Marketplace token for the "w0zro" publisher (Azure DevOps)
+#   OVSX_PAT  -- Open VSX token (open-vsx.org, namespace "w0zro")
+# Without them the publish steps fail; the .vsix is still built and attached.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write   # to attach the .vsix to the GitHub Release
+
+jobs:
+  vscode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # Never ship a stale extension: the committed themes must match the palette.
+      - name: ports fresh
+        run: python3 tools/gen_ports.py --check
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: package + publish
+        working-directory: ports/vscode
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          set -e
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm i -g @vscode/vsce ovsx
+          vsce package "$VERSION" -o "datum-$VERSION.vsix"
+          if [ -n "$VSCE_PAT" ]; then
+            vsce publish --packagePath "datum-$VERSION.vsix" -p "$VSCE_PAT"
+          else
+            echo "::warning::VSCE_PAT not set — skipping Marketplace publish"
+          fi
+          if [ -n "$OVSX_PAT" ]; then
+            ovsx publish "datum-$VERSION.vsix" -p "$OVSX_PAT"
+          else
+            echo "::warning::OVSX_PAT not set — skipping Open VSX publish"
+          fi
+
+      # Creates the GitHub Release for the tag (if one doesn't already exist),
+      # auto-writes notes from the commits/PRs since the previous tag, and
+      # attaches the built .vsix. No manual step in the GitHub UI.
+      - name: create the GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: ports/vscode/*.vsix
+          generate_release_notes: true
+          fail_on_unmatched_files: true
