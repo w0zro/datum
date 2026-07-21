@@ -1,0 +1,4 @@
+# Everything else here (package.json, README.md, LICENSE, themes/) ships.
+# This file just tells vsce what to leave out of the .vsix.
+.vscodeignore
+*.vsix
