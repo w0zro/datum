@@ -284,8 +284,10 @@
 git clone https://github.com/w0zro/datum &amp;&amp; <span class="b">cd</span> datum`;
   const INSTALL = [
     {id:'nvim', name:'Neovim', c:'blue',
-     lead:'Install with any plugin manager, then select the colorscheme.',
-     html:`<div class="step">plugin manager</div>
+     lead:'Install with the built-in vim.pack or any plugin manager, then select the colorscheme.',
+     html:`<div class="step">built-in · vim.pack (Nvim 0.12+)</div>
+<pre class="term">vim.pack.add<span class="pu">(</span>{ <span class="g">'https://github.com/w0zro/datum'</span> }<span class="pu">)</span></pre>
+<div class="step">or a plugin manager</div>
 <pre class="term">lazy.nvim   { <span class="g">'w0zro/datum'</span> }
 vim-plug    <span class="k">Plug</span> <span class="g">'w0zro/datum'</span>
 packer      <span class="k">use</span> <span class="g">'w0zro/datum'</span></pre>
