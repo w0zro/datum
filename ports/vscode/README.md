@@ -1,4 +1,4 @@
-![datum](https://raw.githubusercontent.com/w0zro/datum/main/docs/banner.png)
+![datum](https://raw.githubusercontent.com/w0zro/datum/main/docs/banner-panel.png)
 
 # datum for VS Code
 
