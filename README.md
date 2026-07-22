@@ -1,4 +1,4 @@
-# datum
+![datum](docs/banner.png)
 
 A light and dark colorscheme for **your whole terminal** — Neovim, Ghostty, Kitty, Alacritty,
 WezTerm, VS Code, tmux, fzf, bat, delta and the shell — **derived, not picked**.

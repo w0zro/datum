@@ -1,3 +1,5 @@
+![datum](https://raw.githubusercontent.com/w0zro/datum/main/docs/banner.png)
+
 # datum for VS Code
 
 A light and dark color theme derived from color science. Part of
