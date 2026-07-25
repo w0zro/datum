@@ -17,6 +17,7 @@ default: check
 check:
 	@python3 tools/derive.py --check
 	@python3 tools/gen_ports.py --check
+	@python3 tools/gen_docs.py --check
 	@python3 tools/gen_preview.py --check
 	@echo "all checks passed"
 
@@ -29,6 +30,7 @@ check-nvim:
 
 build:
 	@python3 tools/gen_ports.py
+	@python3 tools/gen_docs.py
 	@python3 tools/gen_preview.py
 
 previews:

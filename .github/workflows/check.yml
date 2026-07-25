@@ -26,6 +26,11 @@ jobs:
       - name: ports in sync with the palette
         run: python3 tools/gen_ports.py --check
 
+      # The site keeps the palette in its CSS variables, the swatch data and the
+      # gem's facets; all three are rewritten from derive.py rather than typed.
+      - name: docs + brand marks match the palette
+        run: python3 tools/gen_docs.py --check
+
       # The README previews are rendered on a Mac (Chrome + Monaspace), so CI
       # can't re-render them -- it verifies the fingerprint each PNG carries.
       - name: previews rendered from the current palette

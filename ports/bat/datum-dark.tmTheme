@@ -10,7 +10,7 @@
       <dict>
         <key>background</key><string>#0f1318</string>
         <key>foreground</key><string>#dbe0e8</string>
-        <key>caret</key><string>#db78b1</string>
+        <key>caret</key><string>#fa94cd</string>
         <key>selection</key><string>#2b2f35</string>
         <key>lineHighlight</key><string>#181c21</string>
       </dict>
@@ -27,28 +27,28 @@
       <key>scope</key><string>string</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#51daa7</string>
+        <key>foreground</key><string>#54dcaa</string>
       </dict>
     </dict>
     <dict>
       <key>scope</key><string>constant.numeric</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#e6ac4c</string>
+        <key>foreground</key><string>#f8bd5f</string>
       </dict>
     </dict>
     <dict>
       <key>scope</key><string>constant.language, constant.character, support.constant</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#d8cf58</string>
+        <key>foreground</key><string>#e8df69</string>
       </dict>
     </dict>
     <dict>
       <key>scope</key><string>keyword, storage</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#66b6f4</string>
+        <key>foreground</key><string>#69b9f7</string>
       </dict>
     </dict>
     <dict>
@@ -62,14 +62,14 @@
       <key>scope</key><string>entity.name.function, support.function</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#db78b1</string>
+        <key>foreground</key><string>#fa94cd</string>
       </dict>
     </dict>
     <dict>
       <key>scope</key><string>entity.name.type, entity.name.class, support.type</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#5ddae0</string>
+        <key>foreground</key><string>#6ae5ec</string>
       </dict>
     </dict>
     <dict>
@@ -97,14 +97,14 @@
       <key>scope</key><string>entity.name.tag</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#db78b1</string>
+        <key>foreground</key><string>#fa94cd</string>
       </dict>
     </dict>
     <dict>
       <key>scope</key><string>invalid</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#ef844a</string>
+        <key>foreground</key><string>#fe9864</string>
       </dict>
     </dict>
   </array>

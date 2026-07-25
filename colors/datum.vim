@@ -21,51 +21,54 @@ endif
 " background. Each entry is [cterm256, guihex]. See datum.w0zro.com/ideas for
 " the full methodology, per-color L/C/H, and measured contrast numbers.
 
+" >>> generated palette -- tools/gen_ports.py, do not edit by hand
 if &background ==# 'light'
   " off-white ground (never pure white -- avoids glare)
-  let s:bg0    = ['231', '#f1f6fd']  " canvas       L 0.97
-  let s:bg1    = ['255', '#e7ecf2']  " cursorline   L 0.94
-  let s:bg2    = ['252', '#ced3d9']  " selection    L 0.86
-  let s:fg1    = ['242', '#616a76']  " comments     L 0.52  WCAG 5.1
-  let s:fg0    = ['236', '#292e35']  " normal text  L 0.30  WCAG 12.6
+  let s:bg0    = ['231', '#f1f6fd']  " canvas             L 0.97  WCAG   1.0
+  let s:bg1    = ['255', '#e7ecf2']  " cursorline         L 0.94  WCAG   1.1
+  let s:bg2    = ['252', '#ced3d9']  " selection          L 0.86  WCAG   1.4
+  let s:fg1    = ['242', '#616a76']  " comments           L 0.52  WCAG   5.0
+  let s:fg0    = ['236', '#292e35']  " normal text        L 0.30  WCAG  12.6
   " tier 1 -- saturated mid-tones: the sparse reference points
-  let s:red    = ['130', '#a44602']  " h 47   error     WCAG 5.6
-  let s:orange = ['94',  '#976700']  " h 77   number    WCAG 4.5
-  let s:yellow = ['94',  '#756f1d']  " h 105  constant  WCAG 4.8
-  let s:green  = ['29',  '#107c5a']  " h 165  string    WCAG 4.8
-  let s:cyan   = ['30',  '#0b7b80']  " h 200  type      WCAG 4.7
-  let s:blue   = ['25',  '#0068a4']  " h 244  keyword   WCAG 5.5
-  let s:purple = ['95',  '#983472']  " h 346  function  WCAG 6.3
-  " tier 2 -- the glue: same hue as its tier-1 sibling, equally saturated,
-  " split by lightness (the one channel that survives every kind of CVD).
-  " On the light ground the glue goes *darker* -- it is the body text, so it
-  " keeps the higher contrast; the accents keep the saturated mid-tones.
-  let s:var    = ['236', '#4d3919']  " h 77   variable  WCAG 10.1
-  let s:op     = ['239', '#2f516c']  " h 244  operator  WCAG 7.7
-  let s:call   = ['239', '#633750']  " h 346  fn call   WCAG 8.8
-  let s:param  = ['23',  '#154b4e']  " h 200  parameter WCAG 9.0
+  let s:red    = ['130', '#a24500']  " h 47   error       L 0.51  WCAG   5.7
+  let s:orange = ['94',  '#976700']  " h 77   number      L 0.55  WCAG   4.5
+  let s:yellow = ['58',  '#656023']  " h 105  constant    L 0.48  WCAG   6.0
+  let s:green  = ['29',  '#007553']  " h 165  string      L 0.50  WCAG   5.3
+  let s:cyan   = ['30',  '#0d7a7f']  " h 200  type        L 0.53  WCAG   4.7
+  let s:blue   = ['31',  '#0176b8']  " h 244  keyword     L 0.55  WCAG   4.5
+  let s:purple = ['95',  '#973070']  " h 346  function    L 0.48  WCAG   6.5
+  " tier 2 -- the glue: same hue as its tier-1 sibling, equally
+  " saturated, split by lightness -- the one channel that survives
+  " every kind of CVD. On the light ground the glue goes *darker*:
+  " it is the body text, so it keeps the higher contrast.
+  let s:var    = ['236', '#4d3919']  " h 77   variable    L 0.36  WCAG  10.1
+  let s:op     = ['239', '#2f516c']  " h 244  operator    L 0.42  WCAG   7.7
+  let s:call   = ['239', '#633750']  " h 346  fn call     L 0.40  WCAG   8.8
+  let s:param  = ['23',  '#154b4e']  " h 200  parameter   L 0.38  WCAG   9.0
 else
   " soft near-black ground (never pure black -- avoids halation)
-  let s:bg0    = ['233', '#0f1318']  " canvas       L 0.18
-  let s:bg1    = ['234', '#181c21']  " cursorline   L 0.22
-  let s:bg2    = ['236', '#2b2f35']  " selection    L 0.30
-  let s:fg1    = ['246', '#8f98a3']  " comments     L 0.68  WCAG 6.4
-  let s:fg0    = ['254', '#dbe0e8']  " normal text  L 0.91  WCAG 14.1
+  let s:bg0    = ['233', '#0f1318']  " canvas             L 0.18  WCAG   1.0
+  let s:bg1    = ['234', '#181c21']  " cursorline         L 0.23  WCAG   1.1
+  let s:bg2    = ['236', '#2b2f35']  " selection          L 0.30  WCAG   1.4
+  let s:fg1    = ['246', '#8f98a3']  " comments           L 0.68  WCAG   6.4
+  let s:fg0    = ['254', '#dbe0e8']  " normal text        L 0.91  WCAG  14.1
   " tier 1 -- saturated mid-tones: the sparse reference points
-  let s:red    = ['209', '#ef844a']  " h 47   error     WCAG 7.2
-  let s:orange = ['179', '#e6ac4c']  " h 77   number    WCAG 9.2
-  let s:yellow = ['185', '#d8cf58']  " h 105  constant  WCAG 11.5
-  let s:green  = ['79',  '#51daa7']  " h 165  string    WCAG 10.6
-  let s:cyan   = ['80',  '#5ddae0']  " h 200  type      WCAG 11.2
-  let s:blue   = ['75',  '#66b6f4']  " h 244  keyword   WCAG 8.5
-  let s:purple = ['175', '#db78b1']  " h 346  function  WCAG 6.5
-  " tier 2 -- the glue: same hue as its tier-1 sibling, equally saturated,
-  " split by lightness (the one channel that survives every kind of CVD)
-  let s:var    = ['223', '#fcdcad']  " h 77   variable  WCAG 14.2
-  let s:op     = ['153', '#b2dafb']  " h 244  operator  WCAG 12.7
-  let s:call   = ['218', '#f5b9d9']  " h 346  fn call   WCAG 11.4
-  let s:param  = ['159', '#a5f5f9']  " h 200  parameter WCAG 15.1
+  let s:red    = ['209', '#fe9864']  " h 47   error       L 0.78  WCAG   8.8
+  let s:orange = ['215', '#f8bd5f']  " h 77   number      L 0.83  WCAG  11.0
+  let s:yellow = ['185', '#e8df69']  " h 105  constant    L 0.89  WCAG  13.5
+  let s:green  = ['79',  '#54dcaa']  " h 165  string      L 0.81  WCAG  10.8
+  let s:cyan   = ['81',  '#6ae5ec']  " h 200  type        L 0.85  WCAG  12.4
+  let s:blue   = ['75',  '#69b9f7']  " h 244  keyword     L 0.76  WCAG   8.8
+  let s:purple = ['212', '#fa94cd']  " h 346  function    L 0.79  WCAG   9.0
+  " tier 2 -- the glue: same hue as its tier-1 sibling, equally
+  " saturated, split by lightness -- the one channel that survives
+  " every kind of CVD.
+  let s:var    = ['223', '#fcdcad']  " h 77   variable    L 0.91  WCAG  14.2
+  let s:op     = ['153', '#b2dafb']  " h 244  operator    L 0.87  WCAG  12.7
+  let s:call   = ['218', '#f5b9d9']  " h 346  fn call     L 0.85  WCAG  11.4
+  let s:param  = ['159', '#a5f5f9']  " h 200  parameter   L 0.92  WCAG  15.1
 endif
+" <<< generated palette
 
 " hi group fg [bg] [attr] [sp] ----------------------------------------------
 " sp sets guisp -- the undercurl/underline color, which diagnostics need so

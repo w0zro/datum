@@ -180,16 +180,27 @@ DARK = {
     "bg0": 0.185, "bg1": 0.225, "bg2": 0.305,
     "fg1": 0.675, "fg1_c": 0.020,     # comments / muted (legible, faint hue)
     "fg0": 0.905, "fg0_c": 0.012,
-    "accent_L": {"red":0.72,"orange":0.78,"yellow":0.84,"green":0.80,"cyan":0.82,"blue":0.75,"purple":0.70},
-    "accent_C": {"red":0.150,"orange":0.130,"yellow":0.140,"green":0.140,"cyan":0.110,"blue":0.120,"purple":0.140},
+    # Lightness raised so every accent clears the APCA body-text aim (Lc 60) on
+    # bg0 -- purple used to sit at 46.7 and red at 50.9, passing the WCAG floor
+    # while falling well short of the perceptual one. Chroma is held at its
+    # original value everywhere except red: at C 0.15 the hue physically cannot
+    # reach Lc 60 inside sRGB (it clips at 58.4), so it gives up 0.01 of chroma.
+    "accent_L": {"red":0.775,"orange":0.834,"yellow":0.889,"green":0.808,"cyan":0.855,"blue":0.759,"purple":0.789},
+    "accent_C": {"red":0.140,"orange":0.130,"yellow":0.140,"green":0.140,"cyan":0.110,"blue":0.120,"purple":0.140},
 }
 LIGHT = {
     "neutral_h": 256, "neutral_c": 0.010,
     "bg0": 0.972, "bg1": 0.940, "bg2": 0.865,
     "fg1": 0.520, "fg1_c": 0.022,
     "fg0": 0.300, "fg0_c": 0.014,
-    "accent_L": {"red":0.510,"orange":0.550,"yellow":0.530,"green":0.520,"cyan":0.530,"blue":0.500,"purple":0.490},
-    "accent_C": {"red":0.140,"orange":0.115,"yellow":0.100,"green":0.105,"cyan":0.088,"blue":0.125,"purple":0.150},
+    # Light-mode lightness was originally bunched into L 0.49-0.55. Hue is what
+    # CVD collapses, so a 0.06 spread left co-occurring accents nearly identical
+    # to a protanope (orange/yellow measured 0.007 apart). These values are the
+    # result of searching L/C -- hue anchors held fixed -- for the assignment
+    # that maximises the worst-case separation across all three simulations
+    # while keeping every accent inside sRGB and above the WCAG floor.
+    "accent_L": {"red":0.506,"orange":0.550,"yellow":0.481,"green":0.497,"cyan":0.527,"blue":0.545,"purple":0.482},
+    "accent_C": {"red":0.140,"orange":0.115,"yellow":0.082,"green":0.105,"cyan":0.087,"blue":0.134,"purple":0.154},
 }
 
 def build(mode):
@@ -297,12 +308,10 @@ def fingerprint():
 # TARGETS are the original design aims; where the palette falls short today it
 # is reported as a warning rather than pretended away.
 WCAG_TEXT = 4.5        # WCAG 2.2 AA body text, every text role on bg0
+APCA_TEXT = 60.0       # APCA body-text contrast for every accent, on bg0
 APCA_MUTED = 45.0      # comments/muted must stay readable
 TIER_SPLIT = 0.05      # min Oklab L gap between a tier-1 accent and its tier-2 sibling
-CVD_FLOOR = 0.006      # min Oklab separation for a co-occurring pair under any CVD
-
-APCA_TEXT_TARGET = 60.0  # APCA body-text aim (not met by the darker dark-mode accents)
-CVD_TARGET = 0.02        # comfortable CVD separation
+CVD_FLOOR = 0.02       # min Oklab separation for a co-occurring pair under any CVD
 
 # Roles rendered as text on bg0.
 TEXT_ROLES = ["red", "orange", "yellow", "green", "cyan", "blue", "purple",
@@ -372,14 +381,14 @@ def check(verbose=True):
              f"worst {d:.3f} ({a}/{b} under {kind})")
         if not ok:
             fails.append(f"{mode}: {a}/{b} only {d:.3f} apart under {kind}")
-        if d < CVD_TARGET:
-            warns.append(f"{mode}: {a}/{b} {d:.3f} under {kind} (below the {CVD_TARGET} aim)")
 
-        # -- APCA aim (reported, not enforced: see APCA_TEXT_TARGET above)
+        # -- APCA: perceptual contrast, where WCAG is unreliable on dark grounds
         worst_apca = min((p[r]["apca"], r) for r in TEXT_ROLES)
-        if worst_apca[0] < APCA_TEXT_TARGET:
-            warns.append(f"{mode}: {worst_apca[1]} at APCA Lc {worst_apca[0]:.1f} "
-                         f"(below the {APCA_TEXT_TARGET:.0f} body-text aim)")
+        ok = worst_apca[0] >= APCA_TEXT
+        emit(ok, f"APCA Lc >= {APCA_TEXT:.0f} for all text roles",
+             f"worst {worst_apca[0]:.1f} ({worst_apca[1]})")
+        if not ok:
+            fails.append(f"{mode}: {worst_apca[1]} at APCA Lc {worst_apca[0]:.1f} < {APCA_TEXT:.0f}")
 
     if verbose:
         if warns:

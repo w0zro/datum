@@ -394,6 +394,64 @@ def iterm(mode):
     )
 
 
+# ---------------------------------------------------------------- vim palette block
+# colors/datum.vim is hand-written: its highlight-group logic (LSP, Tree-sitter
+# captures, gitsigns...) is real work that a generator has no business owning.
+# But the palette block at the top is pure data, and leaving it hand-maintained
+# is exactly how it ended up 13 colors behind the rest of the ports. So only
+# that block is generated, spliced between the markers below, and --check
+# covers it like any other port.
+VIM_BEGIN = '" >>> generated palette -- tools/gen_ports.py, do not edit by hand'
+VIM_END = '" <<< generated palette'
+
+ROLE_NOTE = {
+    "red": "h 47   error", "orange": "h 77   number", "yellow": "h 105  constant",
+    "green": "h 165  string", "cyan": "h 200  type", "blue": "h 244  keyword",
+    "purple": "h 346  function", "var": "h 77   variable", "op": "h 244  operator",
+    "call": "h 346  fn call", "param": "h 200  parameter",
+}
+
+
+def _vim_block(mode):
+    p = palette(mode)
+
+    def line(role, note):
+        v = p[role]
+        cterm = f"'{v['cterm']}',"
+        return (f"  let s:{role:<6} = [{cterm:<6} '{v['hex']}']  "
+                f'" {note:<18} L {v["L"]:.2f}  WCAG {v["wcag"]:5.1f}')
+
+    ground = ("off-white ground (never pure white -- avoids glare)" if mode == "light"
+              else "soft near-black ground (never pure black -- avoids halation)")
+    out = [f'  " {ground}']
+    out += [line(r, n) for r, n in
+            (("bg0", "canvas"), ("bg1", "cursorline"), ("bg2", "selection"),
+             ("fg1", "comments"), ("fg0", "normal text"))]
+    out.append('  " tier 1 -- saturated mid-tones: the sparse reference points')
+    out += [line(r, ROLE_NOTE[r]) for r in
+            ("red", "orange", "yellow", "green", "cyan", "blue", "purple")]
+    out.append('  " tier 2 -- the glue: same hue as its tier-1 sibling, equally')
+    out.append('  " saturated, split by lightness -- the one channel that survives')
+    if mode == "light":
+        out.append('  " every kind of CVD. On the light ground the glue goes *darker*:')
+        out.append('  " it is the body text, so it keeps the higher contrast.')
+    else:
+        out.append('  " every kind of CVD.')
+    out += [line(r, ROLE_NOTE[r]) for r in ("var", "op", "call", "param")]
+    return "\n".join(out)
+
+
+def vim_palette(current):
+    """Rewrite only the marked palette region of colors/datum.vim."""
+    start = current.index(VIM_BEGIN)
+    end = current.index(VIM_END) + len(VIM_END)
+    block = (f"{VIM_BEGIN}\n"
+             f"if &background ==# 'light'\n{_vim_block('light')}\n"
+             f"else\n{_vim_block('dark')}\n"
+             f"endif\n{VIM_END}")
+    return current[:start] + block + current[end:]
+
+
 # ---------------------------------------------------------------- registry
 def _per_mode(app, fn, ext):
     return {f"ports/{app}/datum-{m}.{ext}": (lambda m=m: fn(m)) for m in MODES}
@@ -417,9 +475,24 @@ PORTS["ports/delta/datum.gitconfig"] = delta_theme
 PORTS["ports/shell/datum.sh"] = shell_theme
 
 
+# Files where only a marked region is generated: path -> rewriter(current)->new
+SPLICES = {"colors/datum.vim": vim_palette}
+
+
 def main():
     check = "--check" in sys.argv
     stale = []
+    for rel, rewrite in sorted(SPLICES.items()):
+        path = os.path.join(ROOT, rel)
+        current = open(path).read()
+        content = rewrite(current)
+        if check:
+            if current != content:
+                stale.append(rel + " (palette block)")
+            continue
+        if current != content:
+            open(path, "w").write(content)
+        print(("unchanged " if current == content else "wrote     ") + rel)
     for rel, render in sorted(PORTS.items()):
         path = os.path.join(ROOT, rel)
         content = render()

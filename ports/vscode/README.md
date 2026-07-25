@@ -24,7 +24,8 @@ and [Open VSX](https://open-vsx.org/extension/w0zro/datum).
 ## Notes
 
 The theme JSON in `themes/` is generated from the datum palette — don't edit it by
-hand. To build the extension locally instead of installing from a registry:
+hand. The `version` in `package.json` is a placeholder: releases are driven by the
+git tag, and CI packages the extension as `${TAG#v}`. To build the extension locally instead of installing from a registry:
 
 ```sh
 cd ports/vscode && npm i -g @vscode/vsce && vsce package

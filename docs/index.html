@@ -30,8 +30,8 @@
     color-scheme: dark;
     /* datum DARK palette (brights) */
     --bg0:#0f1318; --bg1:#181c21; --bg2:#2b2f35; --fg0:#dbe0e8; --fg1:#8f98a3;
-    --red:#ef844a; --orange:#e6ac4c; --yellow:#d8cf58; --green:#51daa7;
-    --cyan:#5ddae0; --blue:#66b6f4; --purple:#db78b1;
+    --red:#fe9864; --orange:#f8bd5f; --yellow:#e8df69; --green:#54dcaa;
+    --cyan:#6ae5ec; --blue:#69b9f7; --purple:#fa94cd;
     --var:#fcdcad; --call:#f5b9d9; --param:#a5f5f9; --op:#b2dafb;
     --sans:"Hanken Grotesk",system-ui,sans-serif;
     --disp:"Bricolage Grotesque",var(--sans);
@@ -42,8 +42,8 @@
   :root[data-theme="light"] {
     color-scheme: light;
     --bg0:#f1f6fd; --bg1:#e7ecf2; --bg2:#ced3d9; --fg0:#292e35; --fg1:#616a76;
-    --red:#a44602; --orange:#976700; --yellow:#756f1d; --green:#107c5a;
-    --cyan:#0b7b80; --blue:#0068a4; --purple:#983472;
+    --red:#a24500; --orange:#976700; --yellow:#656023; --green:#007553;
+    --cyan:#0d7a7f; --blue:#0176b8; --purple:#973070;
     --var:#4d3919; --call:#633750; --param:#154b4e; --op:#2f516c;
     --accent:var(--blue);
   }
@@ -51,8 +51,8 @@
     :root:not([data-theme]) {
       color-scheme: light;
       --bg0:#f1f6fd; --bg1:#e7ecf2; --bg2:#ced3d9; --fg0:#292e35; --fg1:#616a76;
-      --red:#a44602; --orange:#976700; --yellow:#756f1d; --green:#107c5a;
-      --cyan:#0b7b80; --blue:#0068a4; --purple:#983472;
+      --red:#a24500; --orange:#976700; --yellow:#656023; --green:#007553;
+      --cyan:#0d7a7f; --blue:#0176b8; --purple:#973070;
       --var:#4d3919; --call:#633750; --param:#154b4e; --op:#2f516c;
       --accent:var(--blue);
     }
@@ -267,13 +267,13 @@
     {n:'bg2',role:'selection, borders',grp:'neutral',bg:1,dark:['#2b2f35',236],light:['#ced3d9',252]},
     {n:'fg1',role:'comments, punctuation',grp:'neutral',dark:['#8f98a3',246],light:['#616a76',242]},
     {n:'fg0',role:'plain text',grp:'neutral',dark:['#dbe0e8',254],light:['#292e35',236]},
-    {n:'red',role:'errors, diagnostics',grp:'tier 1 · full chroma',dark:['#ef844a',209],light:['#a44602',130]},
-    {n:'orange',role:'numbers, booleans',grp:'tier 1 · full chroma',dark:['#e6ac4c',179],light:['#976700',94]},
-    {n:'yellow',role:'constants, ui accents',grp:'tier 1 · full chroma',dark:['#d8cf58',185],light:['#756f1d',94]},
-    {n:'green',role:'strings',grp:'tier 1 · full chroma',dark:['#51daa7',79],light:['#107c5a',29]},
-    {n:'cyan',role:'types',grp:'tier 1 · full chroma',dark:['#5ddae0',80],light:['#0b7b80',30]},
-    {n:'blue',role:'keywords',grp:'tier 1 · full chroma',dark:['#66b6f4',75],light:['#0068a4',25]},
-    {n:'purple',role:'function definitions, specials',grp:'tier 1 · full chroma',dark:['#db78b1',175],light:['#983472',95]},
+    {n:'red',role:'errors, diagnostics',grp:'tier 1 · full chroma',dark:['#fe9864',209],light:['#a24500',130]},
+    {n:'orange',role:'numbers, booleans',grp:'tier 1 · full chroma',dark:['#f8bd5f',215],light:['#976700',94]},
+    {n:'yellow',role:'constants, ui accents',grp:'tier 1 · full chroma',dark:['#e8df69',185],light:['#656023',58]},
+    {n:'green',role:'strings',grp:'tier 1 · full chroma',dark:['#54dcaa',79],light:['#007553',29]},
+    {n:'cyan',role:'types',grp:'tier 1 · full chroma',dark:['#6ae5ec',81],light:['#0d7a7f',30]},
+    {n:'blue',role:'keywords',grp:'tier 1 · full chroma',dark:['#69b9f7',75],light:['#0176b8',31]},
+    {n:'purple',role:'function definitions, specials',grp:'tier 1 · full chroma',dark:['#fa94cd',212],light:['#973070',95]},
     {n:'var',role:'variables, members, properties',grp:'tier 2 · the glue',dark:['#fcdcad',223],light:['#4d3919',236]},
     {n:'call',role:'function calls',grp:'tier 2 · the glue',dark:['#f5b9d9',218],light:['#633750',239]},
     {n:'param',role:'parameters',grp:'tier 2 · the glue',dark:['#a5f5f9',159],light:['#154b4e',23]},
