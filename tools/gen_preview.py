@@ -150,12 +150,13 @@ def check():
     """Verify the committed previews were rendered from the current palette."""
     want = fingerprint()
     stale = []
-    for mode in ("dark", "light"):
-        png = os.path.join(ROOT, "docs", "preview-%s.png" % mode)
+    rasters = [os.path.join(ROOT, "docs", "preview-%s.png" % m) for m in ("dark", "light")]
+    rasters += [os.path.join(ROOT, out) for _src, out, _size in ASSETS]
+    for png in rasters:
         got = read_stamp(png) if os.path.exists(png) else None
         if got != want:
-            stale.append("preview-%s.png (stamped %s, palette is %s)"
-                         % (mode, got or "unstamped", want))
+            stale.append("%s (stamped %s, palette is %s)"
+                         % (os.path.relpath(png, ROOT), got or "unstamped", want))
     if stale:
         print("STALE previews -- re-run tools/gen_preview.py on a Mac:")
         for s in stale:
@@ -163,6 +164,39 @@ def check():
         return 1
     print("previews match the current palette (%s)" % want)
     return 0
+
+
+# ---------------------------------------------------------------- raster assets
+# The avatar, the touch icon and the extension icon are PNGs, so they carry a
+# frozen copy of the palette and had silently gone two versions stale. Render
+# them from the SVGs here, on the same Mac-only Chrome path as the previews.
+#   (svg source, output png, pixel size)
+ASSETS = [
+    ("assets/icon.svg", "assets/icon.png", 512),
+    ("assets/icon.svg", "docs/apple-touch-icon.png", 180),
+    ("assets/icon.svg", "ports/vscode/icon.png", 512),
+]
+
+
+def render_assets():
+    for src, out, size in ASSETS:
+        svg = open(os.path.join(ROOT, src)).read()
+        html = ("<!doctype html><meta charset=utf-8><style>html,body{margin:0;"
+                "background:transparent}svg{display:block;width:%dpx;height:%dpx}"
+                "</style>%s" % (size, size, svg))
+        html_path = "/tmp/datum_asset.html"
+        with open(html_path, "w") as fh:
+            fh.write(html)
+        png = os.path.join(ROOT, out)
+        subprocess.run(
+            [CHROME, "--headless", "--disable-gpu", "--hide-scrollbars",
+             "--default-background-color=00000000",
+             "--force-device-scale-factor=1", f"--window-size={size},{size}",
+             "--screenshot=" + png, html_path],
+            check=True, capture_output=True,
+        )
+        stamp(png, fingerprint())
+        print("wrote %s (%d px)" % (out, size))
 
 
 def main():
@@ -188,6 +222,7 @@ def main():
         stamp(png_path, fp)
         print("wrote %s (%d bytes, palette %s)"
               % (os.path.relpath(png_path, ROOT), os.path.getsize(png_path), fp))
+    render_assets()
     return 0
 
 
