@@ -13,11 +13,13 @@ NOTE: these are faithful renders of the palette, not screenshots of a running
 editor -- Tree-sitter in a real buffer is what actually assigns these roles.
 """
 import os
+import struct
 import subprocess
 import sys
+import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from derive import palette  # noqa: E402
+from derive import fingerprint, palette  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
@@ -103,12 +105,75 @@ def render_html(mode):
     )
 
 
+# ---------------------------------------------------------------- staleness stamp
+# Rendering needs Chrome + Monaspace and only runs on a Mac, so CI cannot just
+# re-render and diff. Instead each PNG carries the palette fingerprint it was
+# rendered from, in a tEXt chunk; --check compares that against the palette
+# today. A hue edit without a re-render is then a hard error instead of a
+# README that quietly shows the old colors.
+PNG_SIG = b"\x89PNG\r\n\x1a\n"
+KEYWORD = b"datum-palette"
+
+
+def _chunks(blob):
+    i = len(PNG_SIG)
+    while i < len(blob):
+        (length,) = struct.unpack(">I", blob[i:i + 4])
+        ctype = blob[i + 4:i + 8]
+        yield ctype, blob[i + 8:i + 8 + length], blob[i:i + 12 + length]
+        i += 12 + length
+
+
+def stamp(png_path, fp):
+    """Insert (or replace) the fingerprint tEXt chunk, just before IEND."""
+    blob = open(png_path, "rb").read()
+    out = bytearray(PNG_SIG)
+    for ctype, _data, raw in _chunks(blob):
+        if ctype == b"tEXt" and _data.startswith(KEYWORD + b"\x00"):
+            continue  # drop a previous stamp
+        if ctype == b"IEND":
+            payload = KEYWORD + b"\x00" + fp.encode()
+            out += struct.pack(">I", len(payload)) + b"tEXt" + payload
+            out += struct.pack(">I", zlib.crc32(b"tEXt" + payload) & 0xFFFFFFFF)
+        out += raw
+    open(png_path, "wb").write(bytes(out))
+
+
+def read_stamp(png_path):
+    for ctype, data, _raw in _chunks(open(png_path, "rb").read()):
+        if ctype == b"tEXt" and data.startswith(KEYWORD + b"\x00"):
+            return data.split(b"\x00", 1)[1].decode()
+    return None
+
+
+def check():
+    """Verify the committed previews were rendered from the current palette."""
+    want = fingerprint()
+    stale = []
+    for mode in ("dark", "light"):
+        png = os.path.join(ROOT, "docs", "preview-%s.png" % mode)
+        got = read_stamp(png) if os.path.exists(png) else None
+        if got != want:
+            stale.append("preview-%s.png (stamped %s, palette is %s)"
+                         % (mode, got or "unstamped", want))
+    if stale:
+        print("STALE previews -- re-run tools/gen_preview.py on a Mac:")
+        for s in stale:
+            print("  " + s)
+        return 1
+    print("previews match the current palette (%s)" % want)
+    return 0
+
+
 def main():
+    if "--check" in sys.argv:
+        return check()
     if not os.path.exists(CHROME):
         print("Google Chrome not found; cannot render previews.")
         return 1
     outdir = os.path.join(ROOT, "docs")
     os.makedirs(outdir, exist_ok=True)
+    fp = fingerprint()
     for mode in ("dark", "light"):
         html_path = "/tmp/datum_preview_%s.html" % mode
         png_path = os.path.join(outdir, "preview-%s.png" % mode)
@@ -120,8 +185,9 @@ def main():
              "--screenshot=" + png_path, html_path],
             check=True, capture_output=True,
         )
-        print("wrote %s (%d bytes)" % (os.path.relpath(png_path, ROOT),
-                                       os.path.getsize(png_path)))
+        stamp(png_path, fp)
+        print("wrote %s (%d bytes, palette %s)"
+              % (os.path.relpath(png_path, ROOT), os.path.getsize(png_path), fp))
     return 0
 
 

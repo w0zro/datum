@@ -14,10 +14,22 @@ jobs:
         with:
           python-version: "3.12"
 
+      # datum's whole claim is that the colors are verified rather than eyeballed.
+      # Asserting it here is what stops a hue edit from silently shipping a
+      # palette that no longer clears its contrast floor -- every other check
+      # below would still pass, because the ports would regenerate consistently.
+      - name: palette meets its contrast + CVD claims
+        run: python3 tools/derive.py --check
+
       # The committed ports must match what the palette generates. If this fails,
       # someone edited a port by hand or forgot to run `python3 tools/gen_ports.py`.
       - name: ports in sync with the palette
         run: python3 tools/gen_ports.py --check
+
+      # The README previews are rendered on a Mac (Chrome + Monaspace), so CI
+      # can't re-render them -- it verifies the fingerprint each PNG carries.
+      - name: previews rendered from the current palette
+        run: python3 tools/gen_preview.py --check
 
       - name: generated files parse
         run: |

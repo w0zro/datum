@@ -278,10 +278,126 @@ def palette(mode):
 def palette_json():
     return {m: palette(m) for m in ("dark", "light")}
 
+def fingerprint():
+    """Stable hash of the whole derived palette.
+
+    Stamped into the preview PNGs so a stale render can be detected without
+    re-rendering (which needs Chrome + Monaspace and only runs on a Mac)."""
+    import hashlib, json
+    blob = json.dumps(palette_json(), sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(blob.encode()).hexdigest()[:16]
+
+# ---------------------------------------------------------------- verification
+# datum's pitch is that the colors are verified, not eyeballed -- so the claims
+# are asserted here and run in CI. Without this, editing a hue angle keeps every
+# port perfectly in sync (gen_ports --check still passes) while the palette
+# silently drops below its contrast floor.
+#
+# FLOORS are hard: they encode what the docs promise, and a regression fails CI.
+# TARGETS are the original design aims; where the palette falls short today it
+# is reported as a warning rather than pretended away.
+WCAG_TEXT = 4.5        # WCAG 2.2 AA body text, every text role on bg0
+APCA_MUTED = 45.0      # comments/muted must stay readable
+TIER_SPLIT = 0.05      # min Oklab L gap between a tier-1 accent and its tier-2 sibling
+CVD_FLOOR = 0.006      # min Oklab separation for a co-occurring pair under any CVD
+
+APCA_TEXT_TARGET = 60.0  # APCA body-text aim (not met by the darker dark-mode accents)
+CVD_TARGET = 0.02        # comfortable CVD separation
+
+# Roles rendered as text on bg0.
+TEXT_ROLES = ["red", "orange", "yellow", "green", "cyan", "blue", "purple",
+              "var", "call", "param", "op", "fg0"]
+# Same-hue tier-1 -> tier-2 siblings. This lightness split IS the scheme's
+# signature mechanism, and it is the separation that survives every kind of CVD.
+TIER_PAIRS = [("orange", "var"), ("blue", "op"), ("purple", "call"), ("cyan", "param")]
+# Accent pairs that plausibly sit next to each other in real code.
+COOCCUR = [("blue", "purple"), ("green", "cyan"), ("orange", "yellow"),
+           ("red", "orange"), ("red", "yellow")]
+
+def check(verbose=True):
+    """Assert the palette still meets its published claims. Returns (fails, warns)."""
+    fails, warns = [], []
+
+    def emit(ok, label, detail, level="FAIL"):
+        if verbose:
+            print(f"  {'PASS' if ok else level:4}  {label:44} {detail}")
+
+    for mode in ("dark", "light"):
+        p = palette(mode)
+        bg0 = p["bg0"]["hex"]
+        if verbose:
+            print(f"\n{mode.upper()}  (bg0={bg0})")
+
+        # -- contrast: every text role clears WCAG AA on the canvas
+        worst = min((p[r]["wcag"], r) for r in TEXT_ROLES)
+        ok = worst[0] >= WCAG_TEXT
+        emit(ok, f"WCAG >= {WCAG_TEXT} for all text roles",
+             f"worst {worst[0]:.2f} ({worst[1]})")
+        if not ok:
+            fails.append(f"{mode}: {worst[1]} at WCAG {worst[0]:.2f} < {WCAG_TEXT}")
+
+        ok = p["fg1"]["wcag"] >= WCAG_TEXT and p["fg1"]["apca"] >= APCA_MUTED
+        emit(ok, f"comments readable (WCAG >= {WCAG_TEXT}, APCA >= {APCA_MUTED:.0f})",
+             f"WCAG {p['fg1']['wcag']:.2f}, APCA {p['fg1']['apca']:.1f}")
+        if not ok:
+            fails.append(f"{mode}: fg1 WCAG {p['fg1']['wcag']:.2f} / APCA {p['fg1']['apca']:.1f}")
+
+        # -- no clipped colors: an out-of-gamut request means the rendered hex
+        #    is not the color the OKLCH spec actually asked for.
+        clipped = [k for k, v in build(mode).items() if v.endswith("*")]
+        clipped += [k for k, (L, C, H) in EXTRAS[mode].items() if oklch_to_hex(L, C, H)[1]]
+        emit(not clipped, "all colors inside sRGB gamut", clipped or "none clipped", "WARN")
+        if clipped:
+            warns.append(f"{mode}: {', '.join(clipped)} clipped to fit sRGB")
+
+        # -- the chroma-tiering mechanism itself
+        worst_split = min((abs(hex_to_oklab(p[a]["hex"])[0] - hex_to_oklab(p[b]["hex"])[0]), a, b)
+                          for a, b in TIER_PAIRS)
+        ok = worst_split[0] >= TIER_SPLIT
+        emit(ok, f"tier-1/tier-2 lightness split >= {TIER_SPLIT}",
+             f"worst {worst_split[0]:.3f} ({worst_split[1]}/{worst_split[2]})")
+        if not ok:
+            fails.append(f"{mode}: {worst_split[1]}/{worst_split[2]} split {worst_split[0]:.3f}")
+
+        # -- CVD: co-occurring pairs must stay apart under all three simulations
+        worst_cvd = (1e9, None, None, None)
+        for a, b in COOCCUR:
+            for kind in ("protan", "deutan", "tritan"):
+                d = oklab_dist(simulate_cvd(p[a]["hex"], kind), simulate_cvd(p[b]["hex"], kind))
+                if d < worst_cvd[0]:
+                    worst_cvd = (d, a, b, kind)
+        d, a, b, kind = worst_cvd
+        ok = d >= CVD_FLOOR
+        emit(ok, f"co-occurring pairs separable under CVD >= {CVD_FLOOR}",
+             f"worst {d:.3f} ({a}/{b} under {kind})")
+        if not ok:
+            fails.append(f"{mode}: {a}/{b} only {d:.3f} apart under {kind}")
+        if d < CVD_TARGET:
+            warns.append(f"{mode}: {a}/{b} {d:.3f} under {kind} (below the {CVD_TARGET} aim)")
+
+        # -- APCA aim (reported, not enforced: see APCA_TEXT_TARGET above)
+        worst_apca = min((p[r]["apca"], r) for r in TEXT_ROLES)
+        if worst_apca[0] < APCA_TEXT_TARGET:
+            warns.append(f"{mode}: {worst_apca[1]} at APCA Lc {worst_apca[0]:.1f} "
+                         f"(below the {APCA_TEXT_TARGET:.0f} body-text aim)")
+
+    if verbose:
+        if warns:
+            print("\nwarnings (design aims not met; not blocking):")
+            for w in warns:
+                print(f"  ! {w}")
+        print("\n" + ("PALETTE FAILS:\n  " + "\n  ".join(fails)
+                      if fails else "palette meets every published claim"))
+    return fails, warns
+
 if __name__ == "__main__":
     import sys, json
     if "--json" in sys.argv:
         print(json.dumps(palette_json(), indent=2))
+    elif "--fingerprint" in sys.argv:
+        print(fingerprint())
+    elif "--check" in sys.argv:
+        sys.exit(1 if check()[0] else 0)
     else:
         for m in ("dark", "light"):
             report(m)

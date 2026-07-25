@@ -82,16 +82,44 @@ The palette in [`tools/derive.py`](tools/derive.py) is the single source of trut
 is generated from it, so nothing can silently fall out of sync.
 
 ```sh
-python3 tools/derive.py            # palette + contrast + CVD report
-python3 tools/derive.py --json     # the palette as JSON
-python3 tools/gen_ports.py         # regenerate every port
-python3 tools/gen_ports.py --check # non-zero exit if any port is stale (CI)
-python3 tools/gen_preview.py       # regenerate the README preview images
+make build                          # regenerate every port + the previews
+make check                          # everything CI checks, locally
+make release                        # tag the next patch version and push
+
+python3 tools/derive.py             # palette + contrast + CVD report
+python3 tools/derive.py --json      # the palette as JSON
+python3 tools/derive.py --check     # assert the contrast + CVD claims (CI)
+python3 tools/gen_ports.py --check  # non-zero exit if any port is stale (CI)
+python3 tools/gen_preview.py --check # non-zero exit if the previews are stale (CI)
 ```
 
 The generated files are **committed**, so nobody has to run the generator to use datum — it's a
 build step for maintainers only. If you change the palette in `tools/derive.py`, re-run
-`gen_ports.py` (and `gen_preview.py`) and commit the results.
+`make build` and commit the results.
+
+### Verification
+
+The claims on the box are asserted, not just printed. `derive.py --check` fails the build if any
+text role drops below **WCAG 4.5:1** on the canvas, if comments stop clearing **APCA Lc 45**, if a
+tier-1 accent and its tier-2 sibling lose their **lightness split** (the mechanism the whole scheme
+rests on), or if two co-occurring accents become inseparable under **protan/deutan/tritan**
+simulation. Design aims the palette doesn't fully meet yet are reported as warnings rather than
+quietly dropped.
+
+Because the previews are rendered on a Mac (Chrome + Monaspace), CI can't re-render them — so each
+PNG carries a fingerprint of the palette it came from, and `gen_preview.py --check` fails if the
+palette has moved on since.
+
+### Releasing
+
+The tag is the version: `release.yml` packages the extension as `${TAG#v}`, so there's nothing to
+bump by hand. `make release` refuses to tag a dirty tree, a non-`main` branch, or unpushed commits,
+runs every check first, then creates the annotated tag and pushes it.
+
+```sh
+make release                  # next patch after the highest existing tag
+make release VERSION=0.2.0    # explicit
+```
 
 ## License
 
